@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions_02g4npr" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="setDueDate" name="Due Date">
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input id="input1" label="Priority" camunda:inputVariable="priority">
+        <inputExpression id="inputExpression1" typeRef="string">
+          <text>priority</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_012h6x5" label="Created At" camunda:inputVariable="created_at">
+        <inputExpression id="LiteralExpression_1k1lmu2" typeRef="date">
+          <text>created_at</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0taqqak" label="Domain" camunda:inputVariable="domain_id">
+        <inputExpression id="LiteralExpression_10vrmou" typeRef="string">
+          <text>domain_id</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Due At Days" name="due_at_days" typeRef="integer" />
+      <rule id="row-297399253-5">
+        <inputEntry id="UnaryTests_18a9pn8">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0oj4w69">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_152ggjc">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1tnsns6">
+          <text>5</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

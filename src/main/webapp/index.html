@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticketing System</title>
+</head>
+<body>
+<h1>Submit your ticket</h1>
+<form name="ticketForm" method="post"action="/API/ticket" >
+    <p>
+        <label for="username">Username: </label>
+        <input type="text" id="username" name="username"/>
+    </p>
+    <p>
+        <label for="message">Message: </label>
+        <textarea rows="5" cols="70" id="message" name="message"></textarea>
+    </p>
+    <p>
+        <input type="submit" value="Submit Ticket"/>
+    </p>
+</form>
+</body>
+</html>
