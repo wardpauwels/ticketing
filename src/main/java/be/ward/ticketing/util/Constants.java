@@ -12,4 +12,5 @@ public class Constants {
     public static final String VAR_CREATOR = "creator";
     public static final String VAR_CREATED_AT = "created_at";
     public static final String VAR_DUE_AT = "due_at";
+    public static final String VAR_STATUS = "status";
 }

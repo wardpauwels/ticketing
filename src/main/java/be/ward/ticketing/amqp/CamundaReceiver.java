@@ -6,9 +6,7 @@ import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.Constants;
 import be.ward.ticketing.util.Messages;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -19,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 @Component
 public class CamundaReceiver {
@@ -30,15 +27,15 @@ public class CamundaReceiver {
     @Autowired
     private ProcessEngine processEngine;
 
-    @RabbitListener(bindings = @QueueBinding( //
-            value = @Queue(value = Messages.MSG_NEW_TICKET, durable = "true"), //
-            exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"), //
-            key = "*"))
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = Messages.MSG_NEW_TICKET, durable = "true"),
+            exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
+            key = Messages.MSG_NEW_TICKET))
     @Transactional
     void newMessageMade(String ticketId) {
         Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(Constants.VAR_TICKET_ID, ticket.getId());
         variables.put(Constants.VAR_CREATOR, ticket.getCreator());
         variables.put(Constants.VAR_CREATED_AT, ticket.getCreatedAt());
@@ -47,14 +44,15 @@ public class CamundaReceiver {
         runtimeService.startProcessInstanceByKey("ticket", variables);
     }
 
-    @RabbitListener(bindings = @QueueBinding( //
-            value = @Queue(value = Messages.MSG_TICKET_ANSWERED, durable = "true"), //
-            exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"), //
-            key = "*"))
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = Messages.MSG_TICKET_ANSWERED, durable = "true"),
+            exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
+            key = Messages.MSG_TICKET_ANSWERED))
     @Transactional
     void sendAnswerOnTicket(String ticketId) {
-
-        TaskService taskService = processEngine.getTaskService();
+        processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_TICKET_ANSWERED)
+                .processInstanceVariableEquals(Constants.VAR_TICKET_ID, Long.valueOf(ticketId))
+                .correlateWithResult();
 
     }
 }

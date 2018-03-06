@@ -59,7 +59,7 @@
       <bpmn:incoming>SequenceFlow_1o8ngwe</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0vk3z4c</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="SequenceFlow_0vk3z4c" sourceRef="ExclusiveGateway_0efyf8f" targetRef="UserTask_ResolveTicket" />
+    <bpmn:sequenceFlow id="SequenceFlow_0vk3z4c" sourceRef="ExclusiveGateway_0efyf8f" targetRef="ReceiveMessage_ResolveTicket" />
     <bpmn:sequenceFlow id="SequenceFlow_0zo83n6" name="No User Assigned" sourceRef="ExclusiveGateway_0szmqie" targetRef="UserTask_AssignResolver">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${assigned_user == null}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -68,11 +68,7 @@
       <bpmn:outgoing>SequenceFlow_1o8ngwe</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:sequenceFlow id="SequenceFlow_1o8ngwe" sourceRef="UserTask_AssignResolver" targetRef="ExclusiveGateway_0efyf8f" />
-    <bpmn:sequenceFlow id="SequenceFlow_017de43" sourceRef="UserTask_ResolveTicket" targetRef="ServiceTask_EmailCustomer" />
-    <bpmn:userTask id="UserTask_ResolveTicket" name="Resolve Ticket">
-      <bpmn:incoming>SequenceFlow_0vk3z4c</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_017de43</bpmn:outgoing>
-    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_017de43" sourceRef="ReceiveMessage_ResolveTicket" targetRef="ServiceTask_EmailCustomer" />
     <bpmn:sequenceFlow id="SequenceFlow_0i3khgv" sourceRef="ServiceTask_MakeCamundaTicket" targetRef="BusinessRule_SetPriority" />
     <bpmn:serviceTask id="ServiceTask_MakeCamundaTicket" name="Make Ticket in Camunda" camunda:delegateExpression="${makeCamundaTicketAdapter}">
       <bpmn:incoming>SequenceFlow_0l8lxek</bpmn:incoming>
@@ -83,7 +79,12 @@
       <bpmn:incoming>SequenceFlow_017de43</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0urwe3h</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:receiveTask id="ReceiveMessage_ResolveTicket" name="Resolve Ticket" messageRef="Message_1azo5xm">
+      <bpmn:incoming>SequenceFlow_0vk3z4c</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_017de43</bpmn:outgoing>
+    </bpmn:receiveTask>
   </bpmn:process>
+  <bpmn:message id="Message_1azo5xm" name="ticketAnswered" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ticket">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
@@ -123,14 +124,14 @@
         <di:waypoint xsi:type="dc:Point" x="688" y="120" />
         <di:waypoint xsi:type="dc:Point" x="763" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="725.5" y="99" width="0" height="12" />
+          <dc:Bounds x="680.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0ksectj_di" bpmnElement="SequenceFlow_0ksectj">
         <di:waypoint xsi:type="dc:Point" x="863" y="120" />
         <di:waypoint xsi:type="dc:Point" x="939" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="901" y="99" width="0" height="12" />
+          <dc:Bounds x="856" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="BusinessRuleTask_0qnzgxd_di" bpmnElement="BusinessRule_SetPriority">
@@ -214,7 +215,7 @@
         <di:waypoint xsi:type="dc:Point" x="1443" y="120" />
         <di:waypoint xsi:type="dc:Point" x="1484" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1463.5" y="99" width="0" height="12" />
+          <dc:Bounds x="1418.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0zo83n6_di" bpmnElement="SequenceFlow_0zo83n6">
@@ -240,12 +241,9 @@
         <di:waypoint xsi:type="dc:Point" x="1584" y="120" />
         <di:waypoint xsi:type="dc:Point" x="1635" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1609.5" y="99" width="0" height="12" />
+          <dc:Bounds x="1564.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="UserTask_0fizclv_di" bpmnElement="UserTask_ResolveTicket">
-        <dc:Bounds x="1484" y="80" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0i3khgv_di" bpmnElement="SequenceFlow_0i3khgv">
         <di:waypoint xsi:type="dc:Point" x="215" y="120" />
         <di:waypoint xsi:type="dc:Point" x="268" y="120" />
@@ -261,11 +259,14 @@
         <di:waypoint xsi:type="dc:Point" x="1948" y="120" />
         <di:waypoint xsi:type="dc:Point" x="1948" y="411" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1841.5" y="99" width="0" height="12" />
+          <dc:Bounds x="1797" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1yixrej_di" bpmnElement="ServiceTask_EmailCustomer">
         <dc:Bounds x="1635" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveTask_1hm0q25_di" bpmnElement="ReceiveMessage_ResolveTicket">
+        <dc:Bounds x="1484" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
