@@ -2,6 +2,7 @@ package be.ward.ticketing.service;
 
 import be.ward.ticketing.data.*;
 import be.ward.ticketing.entities.*;
+import be.ward.ticketing.util.TicketStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +62,7 @@ public class TicketingServiceImpl implements TicketingService {
         ticket.setCreator(username);
         ticket.setDescription(message);
         ticket.setCreatedAt(new Date());
-        ticket.setStatus("Unresolved");
+        ticket.setStatus(TicketStatus.newTicket);
 
         ticket.setDomain(domainDao.findOne(1L));
         ticket.setPriority(priorityDao.findOne(1L));

@@ -4,6 +4,7 @@ import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.entities.Ticket;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.Messages;
+import be.ward.ticketing.util.TicketStatus;
 import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
@@ -40,6 +41,7 @@ public class CamundaReceiver {
         variables.put(Variables.VAR_TICKET_ID, ticket.getId());
         variables.put(Variables.VAR_CREATOR, ticket.getCreator());
         variables.put(Variables.VAR_CREATED_AT, ticket.getCreatedAt());
+        variables.put(Variables.VAR_STATUS, TicketStatus.newTicket);
 
         RuntimeService runtimeService = processEngine.getRuntimeService();
         runtimeService.startProcessInstanceByKey("ticket", variables);
@@ -54,10 +56,6 @@ public class CamundaReceiver {
         processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_TICKET_ANSWERED)
                 .processInstanceVariableEquals(Variables.VAR_TICKET_ID, Long.valueOf(ticketId))
                 .correlateWithResult();
-    }
-
-    void sendMessage() {
-
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -75,6 +73,7 @@ public class CamundaReceiver {
                 .taskVariableValueEquals(Variables.VAR_TICKET_ID, ticket.getId())
                 .singleResult();
         variables.put(Variables.VAR_ASSIGNED_USER, assignedUser);
+        variables.put(Variables.VAR_STATUS, TicketStatus.resolverAssigned);
         processEngine.getTaskService().complete(task.getId(), variables);
     }
 }

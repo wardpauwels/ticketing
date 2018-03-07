@@ -2,6 +2,7 @@ package be.ward.ticketing.adapter;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.util.Messages;
+import be.ward.ticketing.util.TicketStatus;
 import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -19,7 +20,7 @@ public class CloseTicketAdapter implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
-        delegateExecution.setVariable(Variables.VAR_STATUS, "Ticket Closed");
+        delegateExecution.setVariable(Variables.VAR_STATUS, TicketStatus.ticketClosed);
         Long ticketId = (Long) delegateExecution.getVariable(Variables.VAR_TICKET_ID);
 
         rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_CLOSE_TICKET, ticketId);

@@ -3,6 +3,7 @@ package be.ward.ticketing.adapter;
 import be.ward.ticketing.entities.Ticket;
 import be.ward.ticketing.mail.SendMailTLS;
 import be.ward.ticketing.service.TicketingService;
+import be.ward.ticketing.util.TicketStatus;
 import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -25,7 +26,8 @@ public class EmailCustomerAdapter implements JavaDelegate {
         mail.sendMail(
                 "wardpauwels@hotmail.be",
                 "Your ticket has been answered",
-                "Your ticket has been answered. Your question was: " + ticket.getDescription()
+                "Your ticket has been answered.\n Your question was: \n" + ticket.getDescription()
         );
+        delegateExecution.setVariable(Variables.VAR_STATUS, TicketStatus.mailSent);
     }
 }

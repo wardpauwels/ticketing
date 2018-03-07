@@ -28,5 +28,7 @@ public class UpdateTicketsDbAdapter implements JavaDelegate {
                         (String) delegateExecution.getVariable(Variables.VAR_PRIORITY)
                 )
         );
+        ticket.setStatus((String) delegateExecution.getVariable(Variables.VAR_STATUS));
+        ticketingService.saveTicket(ticket);
     }
 }

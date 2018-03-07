@@ -22,6 +22,5 @@ public class UserAssignedAdapter implements JavaDelegate {
         Long ticketId = (Long) delegateExecution.getVariable(Variables.VAR_TICKET_ID);
 
         rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_RESOLVER_ADDED, ticketId);
-
     }
 }
