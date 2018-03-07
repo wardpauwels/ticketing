@@ -1,8 +1,8 @@
 package be.ward.ticketing.adapter;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
-import be.ward.ticketing.util.Constants;
 import be.ward.ticketing.util.Messages;
+import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,8 +19,8 @@ public class CloseTicketAdapter implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
-        delegateExecution.setVariable(Constants.VAR_STATUS, "Ticket Closed");
-        Long ticketId = (Long) delegateExecution.getVariable(Constants.VAR_TICKET_ID);
+        delegateExecution.setVariable(Variables.VAR_STATUS, "Ticket Closed");
+        Long ticketId = (Long) delegateExecution.getVariable(Variables.VAR_TICKET_ID);
 
         rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_CLOSE_TICKET, ticketId);
     }

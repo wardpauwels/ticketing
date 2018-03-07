@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/API")
+@RequestMapping("/api")
 public class AssignerController {
 
     @Autowired
@@ -23,8 +23,7 @@ public class AssignerController {
 
     @PostMapping("/assignusertoticket")
     public void assignUserToTicket(@RequestParam String ticketId, @RequestParam String assignedUser) {
-        Ticket ticket = ticketingService.addResolverToTicket(ticketId, assignedUser);
+        Ticket ticket = ticketingService.addResolverToTicket(Long.valueOf(ticketId), assignedUser);
         rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_RESOLVER_ADDED, ticket.getId());
     }
-
 }

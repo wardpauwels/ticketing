@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PriorityDao extends CrudRepository<Priority, Long> {
+
+    public Priority findByNameEquals(String name);
+
 }

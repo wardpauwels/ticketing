@@ -1,8 +1,8 @@
 package be.ward.ticketing.adapter;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
-import be.ward.ticketing.util.Constants;
 import be.ward.ticketing.util.Messages;
+import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ public class NoUserAssignedAdapter implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution delegateExecution) throws Exception {
-        Long ticketId = (Long) delegateExecution.getVariable(Constants.VAR_TICKET_ID);
+        Long ticketId = (Long) delegateExecution.getVariable(Variables.VAR_TICKET_ID);
 
         logger.debug("------------------------- Message -------------------------");
 

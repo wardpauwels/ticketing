@@ -3,8 +3,8 @@ package be.ward.ticketing.amqp;
 import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.entities.Ticket;
 import be.ward.ticketing.service.TicketingService;
-import be.ward.ticketing.util.Constants;
 import be.ward.ticketing.util.Messages;
+import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -32,13 +32,13 @@ public class CamundaReceiver {
             exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
             key = Messages.MSG_NEW_TICKET))
     @Transactional
-    void newMessageMade(String ticketId) {
+    void sendMessageNewMessageMade(String ticketId) {
         Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
 
         Map<String, Object> variables = new HashMap<>();
-        variables.put(Constants.VAR_TICKET_ID, ticket.getId());
-        variables.put(Constants.VAR_CREATOR, ticket.getCreator());
-        variables.put(Constants.VAR_CREATED_AT, ticket.getCreatedAt());
+        variables.put(Variables.VAR_TICKET_ID, ticket.getId());
+        variables.put(Variables.VAR_CREATOR, ticket.getCreator());
+        variables.put(Variables.VAR_CREATED_AT, ticket.getCreatedAt());
 
         RuntimeService runtimeService = processEngine.getRuntimeService();
         runtimeService.startProcessInstanceByKey("ticket", variables);
@@ -49,9 +49,9 @@ public class CamundaReceiver {
             exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
             key = Messages.MSG_TICKET_ANSWERED))
     @Transactional
-    void sendAnswerOnTicket(String ticketId) {
+    void sendMessageTicketIsAnswered(String ticketId) {
         processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_TICKET_ANSWERED)
-                .processInstanceVariableEquals(Constants.VAR_TICKET_ID, Long.valueOf(ticketId))
+                .processInstanceVariableEquals(Variables.VAR_TICKET_ID, Long.valueOf(ticketId))
                 .correlateWithResult();
     }
 
@@ -60,10 +60,11 @@ public class CamundaReceiver {
             exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
             key = Messages.MSG_RESOLVER_ADDED))
     @Transactional
-    void resolverAssignedToTicket(String ticketId) {
-        String resolver = ticketingService.findTicket(Long.valueOf(ticketId)).getAssignedUser();
-        processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_RESOLVER_ADDED)
-                .processInstanceVariableEquals(Constants.VAR_TICKET_ID, Long.valueOf(ticketId))
-                .correlateWithResult();
+    void sendMessageResolverIsAssignedToTicket(String ticketId) {
+        Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
+        String assignedUser = ticket.getAssignedUser();
+//        processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_RESOLVER_ADDED)
+//                .processInstanceVariableEquals(Variables.VAR_TICKET_ID, Long.valueOf(ticketId))
+//                .correlateWithResult();
     }
 }

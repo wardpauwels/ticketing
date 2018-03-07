@@ -59,11 +59,11 @@
       <bpmn:incoming>SequenceFlow_1o8ngwe</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0vk3z4c</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="SequenceFlow_0vk3z4c" sourceRef="ExclusiveGateway_0efyf8f" targetRef="ReceiveMessage_ResolveTicket" />
+    <bpmn:sequenceFlow id="SequenceFlow_0vk3z4c" sourceRef="ExclusiveGateway_0efyf8f" targetRef="ServiceTask_UpdateTicketsDB" />
     <bpmn:sequenceFlow id="SequenceFlow_0zo83n6" name="No User Assigned" sourceRef="ExclusiveGateway_0szmqie" targetRef="UserTask_AssignResolver">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${assigned_user == null}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:userTask id="UserTask_AssignResolver" name="Manuay Assign User">
+    <bpmn:userTask id="UserTask_AssignResolver" name="Manually Assign User" camunda:candidateGroups="administrator">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="no_user_assigned">true</camunda:inputParameter>
@@ -85,7 +85,7 @@
       <bpmn:outgoing>SequenceFlow_0urwe3h</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:receiveTask id="ReceiveMessage_ResolveTicket" name="Resolve Ticket" messageRef="Message_1azo5xm">
-      <bpmn:incoming>SequenceFlow_0vk3z4c</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_00lazqf</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_017de43</bpmn:outgoing>
     </bpmn:receiveTask>
     <bpmn:sequenceFlow id="SequenceFlow_00p5fsx" sourceRef="ServiceTask_CloseTicket" targetRef="EndEvent_TicketSolved" />
@@ -93,7 +93,7 @@
       <bpmn:incoming>SequenceFlow_0urwe3h</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_00p5fsx</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:subProcess id="SubProcess_05hez3x" name="User was assigned for a ticket" triggeredByEvent="true">
+    <bpmn:subProcess id="SubProcess_05hez3x" name="User was assigned to ticket" triggeredByEvent="true">
       <bpmn:startEvent id="StartEvent_UserAssigned">
         <bpmn:outgoing>SequenceFlow_0cfodxi</bpmn:outgoing>
         <bpmn:conditionalEventDefinition>
@@ -110,7 +110,7 @@
         <bpmn:outgoing>SequenceFlow_0oqvuoi</bpmn:outgoing>
       </bpmn:sendTask>
     </bpmn:subProcess>
-    <bpmn:subProcess id="SubProcess_0gyhy6h" name="No user assigned for ticket" triggeredByEvent="true">
+    <bpmn:subProcess id="SubProcess_0gyhy6h" name="No user assigned to ticket" triggeredByEvent="true">
       <bpmn:startEvent id="StartEvent_NoUserAssigned">
         <bpmn:outgoing>SequenceFlow_10pbqfd</bpmn:outgoing>
         <bpmn:conditionalEventDefinition>
@@ -127,6 +127,11 @@
         <bpmn:outgoing>SequenceFlow_04en34e</bpmn:outgoing>
       </bpmn:serviceTask>
     </bpmn:subProcess>
+    <bpmn:sequenceFlow id="SequenceFlow_00lazqf" sourceRef="ServiceTask_UpdateTicketsDB" targetRef="ReceiveMessage_ResolveTicket" />
+    <bpmn:serviceTask id="ServiceTask_UpdateTicketsDB" name="Update Tickets DB" camunda:delegateExpression="${updateTicketsDbAdapter}">
+      <bpmn:incoming>SequenceFlow_0vk3z4c</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_00lazqf</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:message id="Message_1azo5xm" name="ticketAnswered" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -257,9 +262,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0vk3z4c_di" bpmnElement="SequenceFlow_0vk3z4c">
         <di:waypoint xsi:type="dc:Point" x="1443" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1484" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1494" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1418.5" y="99" width="90" height="12" />
+          <dc:Bounds x="1423.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0zo83n6_di" bpmnElement="SequenceFlow_0zo83n6">
@@ -282,10 +287,10 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_017de43_di" bpmnElement="SequenceFlow_017de43">
-        <di:waypoint xsi:type="dc:Point" x="1584" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1635" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1761" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1812" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1564.5" y="99" width="90" height="12" />
+          <dc:Bounds x="1742" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0i3khgv_di" bpmnElement="SequenceFlow_0i3khgv">
@@ -299,18 +304,18 @@
         <dc:Bounds x="115" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0urwe3h_di" bpmnElement="SequenceFlow_0urwe3h">
-        <di:waypoint xsi:type="dc:Point" x="1735" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1912" y="120" />
         <di:waypoint xsi:type="dc:Point" x="1948" y="120" />
         <di:waypoint xsi:type="dc:Point" x="1948" y="281" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1796.5" y="99" width="90" height="12" />
+          <dc:Bounds x="1885" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1yixrej_di" bpmnElement="ServiceTask_EmailCustomer">
-        <dc:Bounds x="1635" y="80" width="100" height="80" />
+        <dc:Bounds x="1812" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ReceiveTask_1hm0q25_di" bpmnElement="ReceiveMessage_ResolveTicket">
-        <dc:Bounds x="1484" y="80" width="100" height="80" />
+        <dc:Bounds x="1661" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_00p5fsx_di" bpmnElement="SequenceFlow_00p5fsx">
         <di:waypoint xsi:type="dc:Point" x="1948" y="361" />
@@ -385,6 +390,16 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0c5o7fu_di" bpmnElement="Task_0si8qvc">
         <dc:Bounds x="639" y="347" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_00lazqf_di" bpmnElement="SequenceFlow_00lazqf">
+        <di:waypoint xsi:type="dc:Point" x="1594" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1661" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1627.5" y="99" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0egdvk4_di" bpmnElement="ServiceTask_UpdateTicketsDB">
+        <dc:Bounds x="1494" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -64,6 +64,7 @@ public class TicketingServiceImpl implements TicketingService {
         ticket.setStatus("Unresolved");
 
         ticket.setDomain(domainDao.findOne(1L));
+        ticket.setPriority(priorityDao.findOne(1L));
         ticket.setSource(sourceDao.findOne(1L));
         ticket.setTicketType(ticketTypeDao.findOne(1L));
         ticket.setTopic(topicDao.findOne(1L));
@@ -92,8 +93,8 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     @Override
-    public Ticket addResolverToTicket(String ticketId, String assignedUser) {
-        Ticket ticket = findTicket(Long.valueOf(ticketId));
+    public Ticket addResolverToTicket(Long ticketId, String assignedUser) {
+        Ticket ticket = findTicket(ticketId);
         ticket.setAssignedUser(assignedUser);
         return ticketDao.save(ticket);
     }
@@ -101,29 +102,35 @@ public class TicketingServiceImpl implements TicketingService {
     //DOMAIN
 
     @Override
-    public Domain findDomainWithId(long id) {
+    public Domain findDomainWithId(Long id) {
         return domainDao.findOne(id);
     }
 
+    //PRIORITY
+
+    @Override
+    public Priority findPriorityByName(String name) {
+        return priorityDao.findByNameEquals(name);
+    }
 
     //SOURCE
 
     @Override
-    public Source findSourceWithId(long id) {
+    public Source findSourceWithId(Long id) {
         return sourceDao.findOne(id);
     }
 
     //TICKET TYPE
 
     @Override
-    public TicketType findTicketTypeWithId(long id) {
+    public TicketType findTicketTypeWithId(Long id) {
         return ticketTypeDao.findOne(id);
     }
 
     //TOPIC
 
     @Override
-    public Topic findTopicWithId(long id) {
+    public Topic findTopicWithId(Long id) {
         return topicDao.findOne(id);
     }
 

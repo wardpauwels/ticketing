@@ -1,6 +1,6 @@
 package be.ward.ticketing.util;
 
-public class Constants {
+public class Variables {
 
     public static final String VAR_TICKET_ID = "ticket_id";
     public static final String VAR_TOPIC_ID = "topic_id";
@@ -15,4 +15,5 @@ public class Constants {
     public static final String VAR_STATUS = "status";
     public static final String VAR_ASSIGNED_USER = "assigned_user";
     public static final String VAR_ASSIGNED_GROUP = "assigned_group";
+    public static final String VAR_PRIORITY = "priority";
 }
