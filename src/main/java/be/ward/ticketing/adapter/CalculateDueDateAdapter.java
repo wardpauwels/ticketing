@@ -3,7 +3,6 @@ package be.ward.ticketing.adapter;
 import be.ward.ticketing.entities.Ticket;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.Constants;
-import org.apache.tomcat.util.bcel.Const;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import java.util.Date;
 
 @Component
 @ConfigurationProperties
-public class CalculateDueDateAdapter implements JavaDelegate{
+public class CalculateDueDateAdapter implements JavaDelegate {
 
     @Autowired
     private TicketingService ticketingService;
@@ -29,7 +28,7 @@ public class CalculateDueDateAdapter implements JavaDelegate{
         delegateExecution.setVariable(Constants.VAR_DUE_AT, ticket.getDueAt());
     }
 
-    public Date getDatePlusDays(Date date, int days){
+    public Date getDatePlusDays(Date date, int days) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, days); //minus number would decrement the days

@@ -91,6 +91,13 @@ public class TicketingServiceImpl implements TicketingService {
         return ticketDao.save(ticket);
     }
 
+    @Override
+    public Ticket addResolverToTicket(String ticketId, String assignedUser) {
+        Ticket ticket = findTicket(Long.valueOf(ticketId));
+        ticket.setAssignedUser(assignedUser);
+        return ticketDao.save(ticket);
+    }
+
     //DOMAIN
 
     @Override
@@ -102,21 +109,21 @@ public class TicketingServiceImpl implements TicketingService {
     //SOURCE
 
     @Override
-    public Source findSourceWithId(long id){
+    public Source findSourceWithId(long id) {
         return sourceDao.findOne(id);
     }
 
     //TICKET TYPE
 
     @Override
-    public TicketType findTicketTypeWithId(long id){
+    public TicketType findTicketTypeWithId(long id) {
         return ticketTypeDao.findOne(id);
     }
 
     //TOPIC
 
     @Override
-    public Topic findTopicWithId(long id){
+    public Topic findTopicWithId(long id) {
         return topicDao.findOne(id);
     }
 

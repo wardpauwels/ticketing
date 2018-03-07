@@ -32,7 +32,7 @@
           <text><![CDATA["administrator"]]></text>
         </inputEntry>
         <outputEntry id="LiteralExpression_1i7py50">
-          <text><![CDATA["ward"]]></text>
+          <text></text>
         </outputEntry>
       </rule>
       <rule id="row-595974569-2">
@@ -46,7 +46,7 @@
           <text><![CDATA["moderator"]]></text>
         </inputEntry>
         <outputEntry id="LiteralExpression_05r64s4">
-          <text><![CDATA["demo"]]></text>
+          <text></text>
         </outputEntry>
       </rule>
     </decisionTable>

@@ -37,7 +37,7 @@ public class SendMailTLS {
             message.setSubject(subject);
             message.setText(mailText);
 
-//            Transport.send(message);
+            Transport.send(message);
 
             System.out.println("Mail sent!");
 

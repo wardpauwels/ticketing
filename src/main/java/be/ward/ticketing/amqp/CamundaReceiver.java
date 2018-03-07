@@ -53,6 +53,17 @@ public class CamundaReceiver {
         processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_TICKET_ANSWERED)
                 .processInstanceVariableEquals(Constants.VAR_TICKET_ID, Long.valueOf(ticketId))
                 .correlateWithResult();
+    }
 
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = Messages.MSG_RESOLVER_ADDED, durable = "true"),
+            exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
+            key = Messages.MSG_RESOLVER_ADDED))
+    @Transactional
+    void resolverAssignedToTicket(String ticketId) {
+        String resolver = ticketingService.findTicket(Long.valueOf(ticketId)).getAssignedUser();
+        processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_RESOLVER_ADDED)
+                .processInstanceVariableEquals(Constants.VAR_TICKET_ID, Long.valueOf(ticketId))
+                .correlateWithResult();
     }
 }

@@ -24,4 +24,6 @@ public interface TicketingService {
     Ticket findTicket(Long id);
 
     Ticket saveTicket(Ticket ticket);
+
+    Ticket addResolverToTicket(String ticketId, String assignedUser);
 }
