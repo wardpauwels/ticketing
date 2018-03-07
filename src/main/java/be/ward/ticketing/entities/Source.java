@@ -16,4 +16,23 @@ public class Source {
     @Column(name = "name")
     private String name;
 
+    public Long getId() {
+        return id;
+    }
+
+    public Integer getLockVersion() {
+        return lockVersion;
+    }
+
+    public void setLockVersion(Integer lockVersion) {
+        this.lockVersion = lockVersion;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

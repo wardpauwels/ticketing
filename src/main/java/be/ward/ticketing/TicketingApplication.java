@@ -6,8 +6,6 @@ import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.identity.Tenant;
-import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.spring.ProcessEngineFactoryBean;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
@@ -35,8 +33,8 @@ public class TicketingApplication {
         initCamundaRestApi();
 
         processEngine = BpmPlatform.getDefaultProcessEngine();
-        createEngines();
-        deployProcesses();
+        //createEngines();
+        //deployProcesses();
     }
 
     private static void initCamundaRestApi() {
@@ -71,21 +69,6 @@ public class TicketingApplication {
         return result;
     }
 
-//    public List<TenantDto> queryTenants(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
-//        TenantQueryDto queryDto = new TenantQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-//
-//        TenantQuery query = queryDto.toQuery(getProcessEngine());
-//
-//        List<Tenant> tenants;
-//        if (firstResult != null || maxResults != null) {
-//            tenants = executePaginatedQuery(query, firstResult, maxResults);
-//        } else {
-//            tenants = query.list();
-//        }
-//
-//        return TenantDto.fromTenantList(tenants );
-//    }
-
     private static SpringProcessEngineConfiguration processEngineConfiguration(final DataSource dataSource) {
         SpringProcessEngineConfiguration config = new SpringProcessEngineConfiguration();
         config.setDataSource(dataSource);
@@ -118,15 +101,5 @@ public class TicketingApplication {
                 .addClasspathResource("processes/ticket.bpmn")
                 .deploy();
 
-    }
-
-    protected List<Tenant> executePaginatedQuery(TenantQuery query, Integer firstResult, Integer maxResults) {
-        if (firstResult == null) {
-            firstResult = 0;
-        }
-        if (maxResults == null) {
-            maxResults = Integer.MAX_VALUE;
-        }
-        return query.listPage(firstResult, maxResults);
     }
 }

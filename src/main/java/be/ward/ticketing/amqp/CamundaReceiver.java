@@ -7,6 +7,7 @@ import be.ward.ticketing.util.Messages;
 import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.task.Task;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -55,16 +56,25 @@ public class CamundaReceiver {
                 .correlateWithResult();
     }
 
+    void sendMessage() {
+
+    }
+
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = Messages.MSG_RESOLVER_ADDED, durable = "true"),
             exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
             key = Messages.MSG_RESOLVER_ADDED))
     @Transactional
     void sendMessageResolverIsAssignedToTicket(String ticketId) {
+        Map<String, Object> variables = new HashMap<>();
         Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
         String assignedUser = ticket.getAssignedUser();
-//        processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_RESOLVER_ADDED)
-//                .processInstanceVariableEquals(Variables.VAR_TICKET_ID, Long.valueOf(ticketId))
-//                .correlateWithResult();
+
+        Task task = processEngine.getTaskService()
+                .createTaskQuery()
+                .taskVariableValueEquals(Variables.VAR_TICKET_ID, ticket.getId())
+                .singleResult();
+        variables.put(Variables.VAR_ASSIGNED_USER, assignedUser);
+        processEngine.getTaskService().complete(task.getId(), variables);
     }
 }

@@ -28,6 +28,11 @@ public class TicketController {
         return ticket;
     }
 
+    @GetMapping("/ticket/{ticketId}")
+    public Ticket findTicketWithId(@PathVariable String ticketId) {
+        return ticketingService.findTicket(Long.valueOf(ticketId));
+    }
+
     @GetMapping("/tickets")
     public List<Ticket> findAllTickets() {
         List<Ticket> tickets = new ArrayList<>();

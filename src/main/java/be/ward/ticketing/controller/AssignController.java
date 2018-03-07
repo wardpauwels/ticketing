@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class AssignerController {
+public class AssignController {
 
     @Autowired
     protected RabbitTemplate rabbitTemplate;
