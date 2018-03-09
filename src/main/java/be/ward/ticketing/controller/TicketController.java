@@ -54,6 +54,17 @@ public class TicketController {
         return tickets;
     }
 
+    @GetMapping("/ticketsforuser")
+    public List<Ticket> getTicketForResolver(@PathVariable String username) {
+        List<Ticket> tickets = new ArrayList<>();
+
+        for (Ticket ticket : ticketingService.findTicketsForResolver(username)) {
+            tickets.add(ticket);
+        }
+
+        return tickets;
+    }
+
     @PostMapping("/ticket/{ticketId}/answer")
     public void answerOnTicketWithId(@PathVariable String ticketId, @RequestParam String answer) {
         Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));

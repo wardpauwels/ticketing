@@ -30,6 +30,8 @@ public interface TicketingService {
 
     Topic findTopicWithId(Long id);
 
+    Iterable<Ticket> findTicketsForResolver(String username);
+
     User createUser(String username, String password);
 
     Iterable<User> findAllUsers();

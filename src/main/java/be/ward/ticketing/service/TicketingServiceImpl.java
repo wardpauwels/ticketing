@@ -11,54 +11,24 @@ import java.util.Date;
 @Service
 public class TicketingServiceImpl implements TicketingService {
 
+    @Autowired
     private AssociationDao associationDao;
+    @Autowired
     private DomainDao domainDao;
+    @Autowired
     private PriorityDao priorityDao;
+    @Autowired
+    private RoleDao roleDao;
+    @Autowired
     private SourceDao sourceDao;
+    @Autowired
     private TicketDao ticketDao;
+    @Autowired
     private TicketTypeDao ticketTypeDao;
+    @Autowired
     private TopicDao topicDao;
+    @Autowired
     private UserDao userDao;
-
-    @Autowired
-    public void setAssociationDao(AssociationDao associationDao) {
-        this.associationDao = associationDao;
-    }
-
-    @Autowired
-    public void setDomainDao(DomainDao domainDao) {
-        this.domainDao = domainDao;
-    }
-
-    @Autowired
-    public void setPriorityDao(PriorityDao priorityDao) {
-        this.priorityDao = priorityDao;
-    }
-
-    @Autowired
-    public void setSourceDao(SourceDao sourceDao) {
-        this.sourceDao = sourceDao;
-    }
-
-    @Autowired
-    public void setTicketDao(TicketDao ticketDao) {
-        this.ticketDao = ticketDao;
-    }
-
-    @Autowired
-    public void setTicketTypeDao(TicketTypeDao ticketTypeDao) {
-        this.ticketTypeDao = ticketTypeDao;
-    }
-
-    @Autowired
-    public void setTopicDao(TopicDao topicDao) {
-        this.topicDao = topicDao;
-    }
-
-    @Autowired
-    public void setUserDao(UserDao userDao) {
-        this.userDao = userDao;
-    }
 
     // TICKETS
     @Override
@@ -104,6 +74,11 @@ public class TicketingServiceImpl implements TicketingService {
         Ticket ticket = findTicket(ticketId);
         ticket.setAssignedUser(assignedUser);
         return ticketDao.save(ticket);
+    }
+
+    @Override
+    public Iterable<Ticket> findTicketsForResolver(String username) {
+        return ticketDao.findByAssignedUser(username);
     }
 
     //DOMAIN

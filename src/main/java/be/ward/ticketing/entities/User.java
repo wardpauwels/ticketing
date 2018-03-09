@@ -3,6 +3,7 @@ package be.ward.ticketing.entities;
 import be.ward.ticketing.util.BCrypt;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity(name = "user")
 public class User {
@@ -12,11 +13,14 @@ public class User {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "password", unique = true)
+    @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "roles")
+    private Set<Role> roles;
 
     public User() {
     }
@@ -44,5 +48,17 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void addRole(Role role) {
+        roles.add(role);
     }
 }

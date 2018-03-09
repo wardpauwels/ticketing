@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TicketDao extends CrudRepository<Ticket, Long> {
 
-    public Iterable<Ticket> findByAssignedUserIsNull();
+    Iterable<Ticket> findByAssignedUserIsNull();
 
     @Override
     @RestResource(exported = false)
@@ -18,4 +18,5 @@ public interface TicketDao extends CrudRepository<Ticket, Long> {
     @RestResource(exported = false)
     void delete(Ticket ticket);
 
+    Iterable<Ticket> findByAssignedUser(String username);
 }
