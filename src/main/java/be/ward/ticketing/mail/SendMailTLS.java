@@ -1,11 +1,19 @@
 package be.ward.ticketing.mail;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
 public class SendMailTLS {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendMailTLS.class);
+    private static final String HOST = "smtp.gmail.com";
+    private static final String USER = "camundamailtest@gmail.com";
+    private static final String PWD = "camundamail";
 
     public SendMailTLS() {
     }

@@ -2,7 +2,6 @@ package be.ward.ticketing.controller;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.entities.Ticket;
-import be.ward.ticketing.mail.SendMailTLS;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.Messages;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/API")
+@RequestMapping("/api")
 public class TicketController {
 
     @Autowired
@@ -27,6 +26,11 @@ public class TicketController {
         Ticket ticket = ticketingService.createTicket(username, message);
         rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_NEW_TICKET, ticket.getId());
         return ticket;
+    }
+
+    @GetMapping("/ticket/{ticketId}")
+    public Ticket findTicketWithId(@PathVariable String ticketId) {
+        return ticketingService.findTicket(Long.valueOf(ticketId));
     }
 
     @GetMapping("/tickets")

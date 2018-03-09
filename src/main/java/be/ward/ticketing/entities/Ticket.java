@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity(name = "ticket")
-public class Ticket implements Serializable{
+public class Ticket implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
