@@ -44,7 +44,7 @@ public class CamundaReceiver {
         variables.put(Variables.VAR_STATUS, TicketStatus.newTicket);
 
         RuntimeService runtimeService = processEngine.getRuntimeService();
-        runtimeService.startProcessInstanceByKey("ticket", variables);
+        runtimeService.startProcessInstanceByKey("ticket", String.valueOf(ticket.getId()), variables);
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -70,7 +70,7 @@ public class CamundaReceiver {
 
         Task task = processEngine.getTaskService()
                 .createTaskQuery()
-                .taskVariableValueEquals(Variables.VAR_TICKET_ID, ticket.getId())
+                .processInstanceBusinessKey(ticketId)
                 .singleResult();
         variables.put(Variables.VAR_ASSIGNED_USER, assignedUser);
         variables.put(Variables.VAR_STATUS, TicketStatus.resolverAssigned);
