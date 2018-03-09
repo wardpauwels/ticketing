@@ -7,5 +7,6 @@ public class Messages {
     public static final String MSG_RESOLVER_ADDED = "resolverAddedToTicket";
     public static final String MSG_TICKET_ANSWERED = "ticketAnswered";
     public static final String MSG_CLOSE_TICKET = "closeTicket";
+    public static final String MSG_RESOLVER_NOT_FOUND = "userNotFound";
 
 }

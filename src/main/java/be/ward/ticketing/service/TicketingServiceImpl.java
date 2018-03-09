@@ -18,6 +18,7 @@ public class TicketingServiceImpl implements TicketingService {
     private TicketDao ticketDao;
     private TicketTypeDao ticketTypeDao;
     private TopicDao topicDao;
+    private UserDao userDao;
 
     @Autowired
     public void setAssociationDao(AssociationDao associationDao) {
@@ -52,6 +53,11 @@ public class TicketingServiceImpl implements TicketingService {
     @Autowired
     public void setTopicDao(TopicDao topicDao) {
         this.topicDao = topicDao;
+    }
+
+    @Autowired
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
     }
 
     // TICKETS
@@ -135,4 +141,21 @@ public class TicketingServiceImpl implements TicketingService {
         return topicDao.findOne(id);
     }
 
+    // USER
+
+    @Override
+    public User createUser(String username, String password) {
+        User user = new User(username, password);
+        return userDao.save(user);
+    }
+
+    @Override
+    public Iterable<User> findAllUsers() {
+        return userDao.findAll();
+    }
+
+    @Override
+    public User findUserWithUsername(String username) {
+        return userDao.findUserByUsername(username);
+    }
 }

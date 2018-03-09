@@ -1,5 +1,7 @@
 package be.ward.ticketing.entities;
 
+import be.ward.ticketing.util.BCrypt;
+
 import javax.persistence.*;
 
 @Entity(name = "user")
@@ -15,6 +17,14 @@ public class User {
 
     @Column(name = "password", unique = true)
     private String password;
+
+    public User() {
+    }
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+    }
 
     public Long getId() {
         return id;
