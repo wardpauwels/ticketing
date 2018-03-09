@@ -5,13 +5,13 @@ $(document).ready(function () {
 openTicket = () => {
     console.log($(event.target).text());
     $.ajax({
-        url: "/API/ticket/"
+        url: "/api/ticket/"
     });
 };
 
 getAllTickets = () => {
     $.ajax({
-        url: "/API/tickets",
+        url: "/api/tickets",
         success: function (data) {
             for (var i = 0; i < data.length; i++) {
                 date = new Date(data[i].dueAt);
