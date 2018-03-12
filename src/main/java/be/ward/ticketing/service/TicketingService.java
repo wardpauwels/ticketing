@@ -37,4 +37,10 @@ public interface TicketingService {
     Iterable<User> findAllUsers();
 
     User findUserWithUsername(String username);
+
+    Iterable<Domain> findAllDomains();
+
+    Iterable<Priority> findAllPriorities();
+
+    Iterable<Role> findAllRoles();
 }

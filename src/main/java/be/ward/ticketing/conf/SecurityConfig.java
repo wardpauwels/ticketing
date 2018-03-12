@@ -12,25 +12,30 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String SQL_USERS_BY_USERNAME_QUERY =
-            "SELECT username, password, true as enabled FROM user WHERE username = ?;";
-
+            "SELECT username, password, true AS enabled FROM user WHERE username = ?;";
     private static final String SQL_AUTHORITIES_BY_USERNAME_QUERY =
-            "SELECT username, role_id as role FROM user WHERE username = ?;";
-
+            "SELECT username, role AS authority FROM user JOIN role ON user.role_id = role.role_id WHERE username = ?;";
     @Autowired
     DataSource dataSource;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/", "/index.html").permitAll().and()
-                .authorizeRequests().antMatchers("/api/**").hasRole("administrator").and()
-                .formLogin().loginPage("/login").permitAll().and()
-                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login")
-                .and()
-                .csrf().disable();
+        http.authorizeRequests()
+                .antMatchers("/index", "/api/ticket")
+                .permitAll();
+        http.authorizeRequests()
+                .antMatchers("/admin", "/api/**")
+                .hasAuthority("ADMIN");
+        http.formLogin()
+                .loginPage("/login")
+                .permitAll();
+        http.logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/index");
+        http.csrf().disable();
     }
 
     @Autowired

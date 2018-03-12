@@ -83,6 +83,12 @@ public class TicketingServiceImpl implements TicketingService {
 
     //DOMAIN
 
+
+    @Override
+    public Iterable<Domain> findAllDomains() {
+        return domainDao.findAll();
+    }
+
     @Override
     public Domain findDomainWithId(Long id) {
         return domainDao.findOne(id);
@@ -91,9 +97,22 @@ public class TicketingServiceImpl implements TicketingService {
     //PRIORITY
 
     @Override
+    public Iterable<Priority> findAllPriorities() {
+        return priorityDao.findAll();
+    }
+
+    @Override
     public Priority findPriorityByName(String name) {
         return priorityDao.findByNameEquals(name);
     }
+
+    // ROLE
+
+    @Override
+    public Iterable<Role> findAllRoles() {
+        return roleDao.findAll();
+    }
+
 
     //SOURCE
 
