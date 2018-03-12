@@ -3,6 +3,7 @@ package be.ward.ticketing.controller;
 import be.ward.ticketing.entities.Domain;
 import be.ward.ticketing.service.TicketingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,9 +15,9 @@ import java.util.List;
 public class DomainController {
 
     @Autowired
-    TicketingService ticketingService;
+    private TicketingService ticketingService;
 
-    @RequestMapping("/domains")
+    @GetMapping("/domains")
     public List<Domain> findAllDomains() {
         List<Domain> domains = new ArrayList<>();
 

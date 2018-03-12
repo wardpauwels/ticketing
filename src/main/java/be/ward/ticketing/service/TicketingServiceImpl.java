@@ -30,6 +30,8 @@ public class TicketingServiceImpl implements TicketingService {
     @Autowired
     private UserDao userDao;
 
+    // ASSOCIATIONS
+
     // TICKETS
     @Override
     public Ticket createTicket(String username, String message) {
@@ -113,8 +115,12 @@ public class TicketingServiceImpl implements TicketingService {
         return roleDao.findAll();
     }
 
-
     //SOURCE
+
+    @Override
+    public Iterable<Source> findAllSources() {
+        return sourceDao.findAll();
+    }
 
     @Override
     public Source findSourceWithId(Long id) {
@@ -124,11 +130,21 @@ public class TicketingServiceImpl implements TicketingService {
     //TICKET TYPE
 
     @Override
+    public Iterable<TicketType> findAllTicketTypes() {
+        return ticketTypeDao.findAll();
+    }
+
+    @Override
     public TicketType findTicketTypeWithId(Long id) {
         return ticketTypeDao.findOne(id);
     }
 
     //TOPIC
+
+    @Override
+    public Iterable<Topic> findAllTopics() {
+        return topicDao.findAll();
+    }
 
     @Override
     public Topic findTopicWithId(Long id) {

@@ -3,6 +3,7 @@ package be.ward.ticketing.controller;
 import be.ward.ticketing.entities.Role;
 import be.ward.ticketing.service.TicketingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,9 +15,9 @@ import java.util.List;
 public class RoleController {
 
     @Autowired
-    TicketingService ticketingService;
+    private TicketingService ticketingService;
 
-    @RequestMapping("/roles")
+    @GetMapping("/roles")
     public List<Role> findAllRoles() {
         List<Role> roles = new ArrayList<>();
 

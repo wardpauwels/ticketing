@@ -43,4 +43,10 @@ public interface TicketingService {
     Iterable<Priority> findAllPriorities();
 
     Iterable<Role> findAllRoles();
+
+    Iterable<Source> findAllSources();
+
+    Iterable<TicketType> findAllTicketTypes();
+
+    Iterable<Topic> findAllTopics();
 }

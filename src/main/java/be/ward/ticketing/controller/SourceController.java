@@ -1,6 +1,6 @@
 package be.ward.ticketing.controller;
 
-import be.ward.ticketing.entities.Priority;
+import be.ward.ticketing.entities.Source;
 import be.ward.ticketing.service.TicketingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,20 +12,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-public class PriorityController {
+public class SourceController {
 
     @Autowired
     private TicketingService ticketingService;
 
-    @GetMapping("/priorities")
-    public List<Priority> findAllPriorities() {
-        List<Priority> priorities = new ArrayList<>();
+    @GetMapping("/sources")
+    public List<Source> findAllSources() {
+        List<Source> sources = new ArrayList<>();
 
-        for (Priority priority : ticketingService.findAllPriorities()) {
-            priorities.add(priority);
+        for (Source source : ticketingService.findAllSources()) {
+            sources.add(source);
         }
-
-        return priorities;
+        return sources;
     }
-
 }
