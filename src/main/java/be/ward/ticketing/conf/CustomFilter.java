@@ -16,12 +16,10 @@ public class CustomFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        System.out.println("doFilter::called");
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
         Principal userPrincipal = request.getUserPrincipal();
-        System.out.println("userPrincipal::" + userPrincipal);
         filterChain.doFilter(servletRequest, servletResponse);
     }
 

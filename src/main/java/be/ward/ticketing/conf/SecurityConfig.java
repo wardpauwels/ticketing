@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.sql.DataSource;
@@ -13,6 +14,9 @@ import javax.sql.DataSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private static final String SQL_USERS_BY_USERNAME_QUERY =
             "SELECT username, password, true AS enabled FROM user WHERE username = ?;";
@@ -27,7 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/index", "/api/ticket")
                 .permitAll();
         http.authorizeRequests()
-                .antMatchers("/admin", "/api/**")
+                .antMatchers("/admin", "/api/**", "/app/**")
                 .hasAuthority("ADMIN");
         http.formLogin()
                 .loginPage("/login")
@@ -42,9 +46,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
         auth.jdbcAuthentication()
+                .dataSource(dataSource)
+                .passwordEncoder(passwordEncoder)
                 .usersByUsernameQuery(SQL_USERS_BY_USERNAME_QUERY)
-                .authoritiesByUsernameQuery(SQL_AUTHORITIES_BY_USERNAME_QUERY)
-                .dataSource(dataSource);
+                .authoritiesByUsernameQuery(SQL_AUTHORITIES_BY_USERNAME_QUERY);
     }
 
 }

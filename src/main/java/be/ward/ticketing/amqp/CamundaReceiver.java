@@ -54,7 +54,7 @@ public class CamundaReceiver {
     @Transactional
     void sendMessageTicketIsAnswered(String ticketId) {
         processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_TICKET_ANSWERED)
-                .processInstanceVariableEquals(Variables.VAR_TICKET_ID, Long.valueOf(ticketId))
+                .processInstanceBusinessKey(ticketId)
                 .correlateWithResult();
     }
 
@@ -75,5 +75,27 @@ public class CamundaReceiver {
         variables.put(Variables.VAR_ASSIGNED_USER, assignedUser);
         variables.put(Variables.VAR_STATUS, TicketStatus.resolverAssigned);
         processEngine.getTaskService().complete(task.getId(), variables);
+    }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = Messages.MSG_PROBLEM_SOLVED, durable = "true"),
+            exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
+            key = Messages.MSG_PROBLEM_SOLVED))
+    @Transactional
+    void sendMessageTicketIsSolved(String ticketId) {
+        processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_PROBLEM_SOLVED)
+                .processInstanceBusinessKey(ticketId)
+                .correlateWithResult();
+    }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = Messages.MSG_PROBLEM_NOT_SOLVED, durable = "true"),
+            exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
+            key = Messages.MSG_PROBLEM_NOT_SOLVED))
+    @Transactional
+    void sendMessageTicketIsNotSolved(String ticketId) {
+        processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_PROBLEM_NOT_SOLVED)
+                .processInstanceBusinessKey(ticketId)
+                .correlateWithResult();
     }
 }

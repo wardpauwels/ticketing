@@ -4,6 +4,7 @@ import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.entities.Ticket;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.Messages;
+import be.ward.ticketing.util.TicketStatus;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -71,5 +72,21 @@ public class TicketController {
         ticket.setTopicText(answer);
         ticket = ticketingService.saveTicket(ticket);
         rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_TICKET_ANSWERED, ticket.getId());
+    }
+
+    @PostMapping("/ticketnotsolved/{ticketId}")
+    public void ticketWasNotSolved(@PathVariable String ticketId) {
+        Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
+        ticket.setStatus(TicketStatus.ticketNotSolved);
+        ticketingService.saveTicket(ticket);
+        rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_PROBLEM_NOT_SOLVED, ticket.getId());
+    }
+
+    @PostMapping("/ticketsolved/{ticketId}")
+    public void ticketSolved(@PathVariable String ticketId) {
+        Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
+        ticket.setStatus(TicketStatus.ticketSolved);
+        ticketingService.saveTicket(ticket);
+        rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_PROBLEM_SOLVED, ticket.getId());
     }
 }
