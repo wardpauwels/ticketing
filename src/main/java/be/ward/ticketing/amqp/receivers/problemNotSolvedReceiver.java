@@ -2,6 +2,7 @@ package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.util.Messages;
+import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
@@ -22,9 +23,12 @@ public class problemNotSolvedReceiver {
             exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
             key = Messages.MSG_PROBLEM_NOT_SOLVED))
     @Transactional
-    void sendMessageTicketIsNotSolved(String ticketId) {
+    void sendMessageTicketIsNotSolved(Object[] paramArray) {
+        Long ticketId = (Long) paramArray[0];
+        String comment = (String) paramArray[1];
         processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_PROBLEM_NOT_SOLVED)
-                .processInstanceBusinessKey(ticketId)
+                .setVariable(Variables.VAR_COMMENT, comment)
+                .processInstanceBusinessKey(String.valueOf(ticketId))
                 .correlateWithResult();
     }
 

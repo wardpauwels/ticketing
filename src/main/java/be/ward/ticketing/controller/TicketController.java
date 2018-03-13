@@ -81,10 +81,10 @@ public class TicketController {
     }
 
     @PostMapping("/ticketnotsolved/{ticketId}")
-    public void ticketWasNotSolved(@PathVariable String ticketId) {
+    public void ticketWasNotSolved(@PathVariable String ticketId, @RequestParam String comment) {
         Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
         ticket.setStatus(TicketStatus.ticketNotSolved);
         ticketingService.saveTicket(ticket);
-        rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_PROBLEM_NOT_SOLVED, ticket.getId());
+        rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_PROBLEM_NOT_SOLVED, new Object[]{ticket.getId(), comment});
     }
 }

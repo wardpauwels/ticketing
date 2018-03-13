@@ -49,4 +49,6 @@ public interface TicketingService {
     Iterable<TicketType> findAllTicketTypes();
 
     Iterable<Topic> findAllTopics();
+
+    Priority findPriorityWithId(Long id);
 }

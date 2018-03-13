@@ -39,6 +39,7 @@ public class newTicketReceiver {
         Map<String, Object> variables = new HashMap<>();
         variables.put(Variables.VAR_TICKET_ID, ticket.getId());
         variables.put(Variables.VAR_CREATOR, ticket.getCreator());
+        variables.put(Variables.VAR_DESCRIPTION, ticket.getDescription());
         variables.put(Variables.VAR_CREATED_AT, ticket.getCreatedAt());
         variables.put(Variables.VAR_STATUS, TicketStatus.newTicket);
 

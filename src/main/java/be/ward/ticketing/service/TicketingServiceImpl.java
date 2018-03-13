@@ -104,6 +104,11 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     @Override
+    public Priority findPriorityWithId(Long id) {
+        return priorityDao.findOne(id);
+    }
+
+    @Override
     public Priority findPriorityByName(String name) {
         return priorityDao.findByNameEquals(name);
     }

@@ -25,12 +25,9 @@
           <text>created_at</text>
         </inputExpression>
       </input>
-      <output id="output1" label="Priority" name="priority" typeRef="string">
-        <outputValues id="UnaryTests_1bf7q0x">
-          <text></text>
-        </outputValues>
-      </output>
+      <output id="output1" label="Priority" name="priority" typeRef="string" />
       <rule id="row-297399253-7">
+        <description></description>
         <inputEntry id="UnaryTests_1xaz42x">
           <text></text>
         </inputEntry>
