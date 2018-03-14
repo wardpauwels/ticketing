@@ -8,5 +8,6 @@ public class TicketStatus {
     public static final String resolverAssigned = "Resolver assigned";
     public static final String ticketAnswered = "Ticket answered";
     public static final String ticketClosed = "Ticket closed";
-
+    public static final String ticketNotSolved = "Ticket is not resolved";
+    public static final String ticketSolved = "Ticket is solved";
 }

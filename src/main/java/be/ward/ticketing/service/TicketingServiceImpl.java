@@ -1,7 +1,11 @@
 package be.ward.ticketing.service;
 
-import be.ward.ticketing.data.*;
-import be.ward.ticketing.entities.*;
+import be.ward.ticketing.data.ticketing.*;
+import be.ward.ticketing.data.user.RoleDao;
+import be.ward.ticketing.data.user.UserDao;
+import be.ward.ticketing.entities.ticketing.*;
+import be.ward.ticketing.entities.user.Role;
+import be.ward.ticketing.entities.user.User;
 import be.ward.ticketing.util.TicketStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,48 +15,26 @@ import java.util.Date;
 @Service
 public class TicketingServiceImpl implements TicketingService {
 
+    @Autowired
     private AssociationDao associationDao;
+    @Autowired
     private DomainDao domainDao;
+    @Autowired
     private PriorityDao priorityDao;
+    @Autowired
+    private RoleDao roleDao;
+    @Autowired
     private SourceDao sourceDao;
+    @Autowired
     private TicketDao ticketDao;
+    @Autowired
     private TicketTypeDao ticketTypeDao;
+    @Autowired
     private TopicDao topicDao;
-
     @Autowired
-    public void setAssociationDao(AssociationDao associationDao) {
-        this.associationDao = associationDao;
-    }
+    private UserDao userDao;
 
-    @Autowired
-    public void setDomainDao(DomainDao domainDao) {
-        this.domainDao = domainDao;
-    }
-
-    @Autowired
-    public void setPriorityDao(PriorityDao priorityDao) {
-        this.priorityDao = priorityDao;
-    }
-
-    @Autowired
-    public void setSourceDao(SourceDao sourceDao) {
-        this.sourceDao = sourceDao;
-    }
-
-    @Autowired
-    public void setTicketDao(TicketDao ticketDao) {
-        this.ticketDao = ticketDao;
-    }
-
-    @Autowired
-    public void setTicketTypeDao(TicketTypeDao ticketTypeDao) {
-        this.ticketTypeDao = ticketTypeDao;
-    }
-
-    @Autowired
-    public void setTopicDao(TopicDao topicDao) {
-        this.topicDao = topicDao;
-    }
+    // ASSOCIATIONS
 
     // TICKETS
     @Override
@@ -100,7 +82,18 @@ public class TicketingServiceImpl implements TicketingService {
         return ticketDao.save(ticket);
     }
 
+    @Override
+    public Iterable<Ticket> findTicketsForResolver(String username) {
+        return ticketDao.findByAssignedUser(username);
+    }
+
     //DOMAIN
+
+
+    @Override
+    public Iterable<Domain> findAllDomains() {
+        return domainDao.findAll();
+    }
 
     @Override
     public Domain findDomainWithId(Long id) {
@@ -110,11 +103,33 @@ public class TicketingServiceImpl implements TicketingService {
     //PRIORITY
 
     @Override
+    public Iterable<Priority> findAllPriorities() {
+        return priorityDao.findAll();
+    }
+
+    @Override
+    public Priority findPriorityWithId(Long id) {
+        return priorityDao.findOne(id);
+    }
+
+    @Override
     public Priority findPriorityByName(String name) {
         return priorityDao.findByNameEquals(name);
     }
 
+    // ROLE
+
+    @Override
+    public Iterable<Role> findAllRoles() {
+        return roleDao.findAll();
+    }
+
     //SOURCE
+
+    @Override
+    public Iterable<Source> findAllSources() {
+        return sourceDao.findAll();
+    }
 
     @Override
     public Source findSourceWithId(Long id) {
@@ -124,6 +139,11 @@ public class TicketingServiceImpl implements TicketingService {
     //TICKET TYPE
 
     @Override
+    public Iterable<TicketType> findAllTicketTypes() {
+        return ticketTypeDao.findAll();
+    }
+
+    @Override
     public TicketType findTicketTypeWithId(Long id) {
         return ticketTypeDao.findOne(id);
     }
@@ -131,8 +151,30 @@ public class TicketingServiceImpl implements TicketingService {
     //TOPIC
 
     @Override
+    public Iterable<Topic> findAllTopics() {
+        return topicDao.findAll();
+    }
+
+    @Override
     public Topic findTopicWithId(Long id) {
         return topicDao.findOne(id);
     }
 
+    // USER
+
+    @Override
+    public User createUser(String username, String password) {
+        User user = new User(username, password);
+        return userDao.save(user);
+    }
+
+    @Override
+    public Iterable<User> findAllUsers() {
+        return userDao.findAll();
+    }
+
+    @Override
+    public User findUserWithUsername(String username) {
+        return userDao.findUserByUsername(username);
+    }
 }

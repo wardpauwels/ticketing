@@ -17,11 +17,12 @@ public class MakeCamundaTicketAdapter implements JavaDelegate {
     private TicketingService ticketingService;
 
     @Override
-    public void execute(DelegateExecution delegateExecution) throws Exception {
+    public void execute(DelegateExecution delegateExecution) {
 
-        delegateExecution.setVariable(Variables.VAR_STATUS, TicketStatus.newTicket);
         delegateExecution.setVariable(Variables.VAR_DOMAIN_ID, ticketingService.findDomainWithId(1L).getId());
+        delegateExecution.setVariable(Variables.VAR_PRIORITY_ID, ticketingService.findPriorityWithId(1L).getId());
         delegateExecution.setVariable(Variables.VAR_SOURCE_ID, ticketingService.findDomainWithId(1L).getId());
+        delegateExecution.setVariable(Variables.VAR_STATUS, TicketStatus.newTicket);
         delegateExecution.setVariable(Variables.VAR_TICKET_TYPE_ID, ticketingService.findTicketTypeWithId(1L).getId());
         delegateExecution.setVariable(Variables.VAR_TOPIC_ID, ticketingService.findTopicWithId(1L).getId());
 

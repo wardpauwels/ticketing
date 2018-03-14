@@ -1,6 +1,6 @@
 package be.ward.ticketing.adapter;
 
-import be.ward.ticketing.entities.Ticket;
+import be.ward.ticketing.entities.ticketing.Ticket;
 import be.ward.ticketing.mail.SendMailTLS;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.TicketStatus;
@@ -19,7 +19,7 @@ public class EmailCustomerAdapter implements JavaDelegate {
     private TicketingService ticketingService;
 
     @Override
-    public void execute(DelegateExecution delegateExecution) throws Exception {
+    public void execute(DelegateExecution delegateExecution) {
         Ticket ticket = ticketingService.findTicket((Long) delegateExecution.getVariable(Variables.VAR_TICKET_ID));
         SendMailTLS mail = new SendMailTLS();
         //TODO: Get mail address from the user
