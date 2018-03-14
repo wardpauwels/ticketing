@@ -1,6 +1,6 @@
 package be.ward.ticketing.adapter;
 
-import be.ward.ticketing.entities.Ticket;
+import be.ward.ticketing.entities.ticketing.Ticket;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -20,7 +20,7 @@ public class CalculateDueDateAdapter implements JavaDelegate {
     private TicketingService ticketingService;
 
     @Override
-    public void execute(DelegateExecution delegateExecution) throws Exception {
+    public void execute(DelegateExecution delegateExecution) {
         Ticket ticket = ticketingService.findTicket((Long) delegateExecution.getVariable(Variables.VAR_TICKET_ID));
         int days = (int) delegateExecution.getVariable(Variables.VAR_DUE_AT_DAYS);
         ticket.setDueAt(getDatePlusDays(ticket.getCreatedAt(), days));

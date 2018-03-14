@@ -1,7 +1,11 @@
 package be.ward.ticketing.service;
 
-import be.ward.ticketing.data.*;
-import be.ward.ticketing.entities.*;
+import be.ward.ticketing.data.ticketing.*;
+import be.ward.ticketing.data.user.RoleDao;
+import be.ward.ticketing.data.user.UserDao;
+import be.ward.ticketing.entities.ticketing.*;
+import be.ward.ticketing.entities.user.Role;
+import be.ward.ticketing.entities.user.User;
 import be.ward.ticketing.util.TicketStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,8 @@
 package be.ward.ticketing.service;
 
-import be.ward.ticketing.entities.*;
+import be.ward.ticketing.entities.ticketing.*;
+import be.ward.ticketing.entities.user.Role;
+import be.ward.ticketing.entities.user.User;
 import org.springframework.stereotype.Service;
 
 @Service

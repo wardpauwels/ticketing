@@ -13,6 +13,10 @@ public class SpringBeansConfiguration {
 
     public final static String exchangeName = "ticketing";
 
+    public final static String URL = "jdbc:mysql://localhost:3306/db_ticketingsystem?useSSL=false";
+    public final static String USERNAME = "ticketmaster";
+    public final static String PASSWORD = "mJ2CEk9EA7rDrNp0";
+
     @Bean
     public TicketingService ticketingService() {
         return new TicketingServiceImpl();
@@ -22,4 +26,14 @@ public class SpringBeansConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+//    @Bean
+//    public DataSource dataSource() {
+//        BasicDataSource dataSource = new BasicDataSource();
+//        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+//        dataSource.setUrl(URL);
+//        dataSource.setUsername(USERNAME);
+//        dataSource.setPassword(PASSWORD);
+//        return dataSource;
+//    }
 }
