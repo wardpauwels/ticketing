@@ -2,6 +2,7 @@ package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.entities.ticketing.Ticket;
+import be.ward.ticketing.service.TenantService;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.Messages;
 import be.ward.ticketing.util.TicketStatus;
@@ -24,6 +25,9 @@ public class newTicketReceiver {
 
     @Autowired
     private TicketingService ticketingService;
+
+    @Autowired
+    private TenantService tenantService;
 
     @Autowired
     private ProcessEngine processEngine;
