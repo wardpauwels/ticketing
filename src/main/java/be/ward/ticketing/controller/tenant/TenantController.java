@@ -1,6 +1,5 @@
 package be.ward.ticketing.controller.tenant;
 
-import be.ward.ticketing.entities.tenants.Tenant;
 import be.ward.ticketing.service.TenantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +15,8 @@ public class TenantController {
     private TenantService tenantService;
 
     @PostMapping("/addtenant")
-    private Tenant addTenant(@RequestParam String tenantId, @RequestParam String tenantName) {
-        return tenantService.addTenant(new Tenant(tenantId, tenantName));
+    private String addTenant(@RequestParam String tenantId, @RequestParam String tenantName) {
+        return tenantService.addTenant(tenantId, tenantName);
     }
 
     @PostMapping("/deletetenant")
@@ -30,9 +29,19 @@ public class TenantController {
         return tenantService.startProcessEngine(engineId);
     }
 
+    @PostMapping("/startengines")
+    private String startEngines() {
+        return tenantService.startProcessEngines();
+    }
+
     @PostMapping("/stopengine")
     private String stopEngine(@RequestParam String engineId) {
         return tenantService.stopProcessEngine(engineId);
+    }
+
+    @PostMapping("/stopengines")
+    private String stopEngines() {
+        return tenantService.stopProcessEngines();
     }
 
     @PostMapping("/deployprocess")

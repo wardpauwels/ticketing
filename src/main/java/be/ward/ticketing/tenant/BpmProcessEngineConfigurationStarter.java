@@ -41,7 +41,7 @@
 //
 //    // should be retrieved from tenant-service
 //    public static List<String> getTenants() {
-//        // TODO: retrieve data sources for all tenants from tenant-service
+//        // TODO: retrieve data sources for all tenant from tenant-service
 //        List<String> result = new ArrayList<>();
 //        result.add("tenant1");
 //        result.add("tenant2");

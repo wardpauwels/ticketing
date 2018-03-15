@@ -1,4 +1,4 @@
-package be.ward.ticketing.entities.tenants;
+package be.ward.ticketing.entities.tenant;
 
 import javax.persistence.*;
 
@@ -7,13 +7,13 @@ public class Engine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "engine_id")
-    private int id;
+    @Column(name = "id", nullable = false)
+    private Long id;
 
     public Engine() {
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 }
