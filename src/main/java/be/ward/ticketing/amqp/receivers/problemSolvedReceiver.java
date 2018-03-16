@@ -1,6 +1,7 @@
 package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
+import be.ward.ticketing.service.TenantService;
 import be.ward.ticketing.util.Messages;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -17,13 +18,18 @@ public class problemSolvedReceiver {
     @Autowired
     private ProcessEngine processEngine;
 
+    @Autowired
+    private TenantService tenantService;
+
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = Messages.MSG_PROBLEM_SOLVED, durable = "true"),
             exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
             key = Messages.MSG_PROBLEM_SOLVED))
     @Transactional
     void sendMessageTicketIsSolved(String ticketId) {
-        processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_PROBLEM_SOLVED)
+        processEngine
+                .getRuntimeService()
+                .createMessageCorrelation(Messages.MSG_PROBLEM_SOLVED)
                 .processInstanceBusinessKey(ticketId)
                 .correlateWithResult();
     }

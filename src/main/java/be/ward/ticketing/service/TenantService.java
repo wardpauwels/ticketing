@@ -5,6 +5,7 @@ import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
@@ -27,8 +28,11 @@ public class TenantService {
 
     public String addTenant(String tenantId, String tenantName) {
         if (getTenant(tenantId) == null) {
-            camunda.getIdentityService().saveTenant(createTenant(tenantId, tenantName));
-            return "Tenant has been added to db.";
+            Tenant tenant = createTenant(tenantId, tenantName);
+            camunda.getIdentityService().saveTenant(tenant);
+            System.out.println("Tenant with id [" + tenantId + "] created.");
+            startProcessEngine(tenant.getId());
+            return "Tenant has been added to db and engine has started.";
         } else {
             return "Tenant already exists in db.";
         }
@@ -145,6 +149,8 @@ public class TenantService {
                         .getRepositoryService()
                         .getResourceAsStream(deploymentId, processDefinition.getResourceName()));
 
+        deploymentBuilder.tenantId(engineId);
+
         //deployment
         Deployment deployment = deploymentBuilder.enableDuplicateFiltering(false).deploy();
 
@@ -154,7 +160,7 @@ public class TenantService {
             getProcessEngine(engineId).getManagementService().registerProcessApplication(deployment.getId(), processApplication);
         }
 
-        return "Process [" + processKey + "] successfully deployed to engine [" + engineId + "].";
+        return "Process [" + processKey + "] successfull deployed to engine [" + engineId + "].";
     }
 
     private List<ProcessEngine> getAllProcessEngines() {
@@ -162,7 +168,17 @@ public class TenantService {
     }
 
     public ProcessEngine getProcessEngine(String engineId) {
-        return RuntimeContainerDelegate.INSTANCE.get().getProcessEngineService().getProcessEngine(engineId);
+        if (engineId != null) {
+            ProcessEngine processEngine = RuntimeContainerDelegate.INSTANCE.get().getProcessEngineService().getProcessEngine(engineId);
+            if (processEngine != null) {
+                return processEngine;
+            } else {
+                //no process engine running with engineId
+                return null;
+            }
+        } else {
+            throw new ProcessEngineException("No tenant id specified. A process engine can only be retrieved based on a tenant.");
+        }
     }
 
 }

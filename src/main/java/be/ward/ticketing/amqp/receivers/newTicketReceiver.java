@@ -8,7 +8,6 @@ import be.ward.ticketing.util.Messages;
 import be.ward.ticketing.util.TicketStatus;
 import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -47,8 +46,10 @@ public class newTicketReceiver {
         variables.put(Variables.VAR_CREATED_AT, ticket.getCreatedAt());
         variables.put(Variables.VAR_STATUS, TicketStatus.newTicket);
 
-        RuntimeService runtimeService = processEngine.getRuntimeService();
-        runtimeService.startProcessInstanceByKey("ticket", String.valueOf(ticket.getId()), variables);
+        //TODO: load tenant engine dynamically
+        processEngine
+                .getRuntimeService()
+                .startProcessInstanceByKey("ticket", String.valueOf(ticket.getId()), variables);
     }
 
 }

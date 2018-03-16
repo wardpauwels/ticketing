@@ -13,6 +13,8 @@ import javax.annotation.PostConstruct;
 @SpringBootApplication
 public class TicketingApplication {
 
+    public static boolean experimental = false;
+
     @Autowired
     private TenantService tenantService;
 

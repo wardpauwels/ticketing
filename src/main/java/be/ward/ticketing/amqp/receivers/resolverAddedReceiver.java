@@ -2,6 +2,7 @@ package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.entities.ticketing.Ticket;
+import be.ward.ticketing.service.TenantService;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.Messages;
 import be.ward.ticketing.util.TicketStatus;
@@ -28,6 +29,9 @@ public class resolverAddedReceiver {
     @Autowired
     private ProcessEngine processEngine;
 
+    @Autowired
+    private TenantService tenantService;
+
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = Messages.MSG_RESOLVER_ADDED, durable = "true"),
             exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
@@ -38,13 +42,18 @@ public class resolverAddedReceiver {
         Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
         String assignedUser = ticket.getAssignedUser();
 
-        Task task = processEngine.getTaskService()
+        Task task = processEngine
+                .getTaskService()
                 .createTaskQuery()
                 .processInstanceBusinessKey(ticketId)
                 .singleResult();
+
         variables.put(Variables.VAR_ASSIGNED_USER, assignedUser);
         variables.put(Variables.VAR_STATUS, TicketStatus.resolverAssigned);
-        processEngine.getTaskService().complete(task.getId(), variables);
+
+        processEngine
+                .getTaskService()
+                .complete(task.getId(), variables);
     }
 
 }

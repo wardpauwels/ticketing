@@ -1,6 +1,7 @@
 package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
+import be.ward.ticketing.service.TenantService;
 import be.ward.ticketing.util.Messages;
 import be.ward.ticketing.util.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -18,6 +19,9 @@ public class problemNotSolvedReceiver {
     @Autowired
     private ProcessEngine processEngine;
 
+    @Autowired
+    private TenantService tenantService;
+
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = Messages.MSG_PROBLEM_NOT_SOLVED, durable = "true"),
             exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
@@ -26,7 +30,9 @@ public class problemNotSolvedReceiver {
     void sendMessageTicketIsNotSolved(Object[] paramArray) {
         Long ticketId = (Long) paramArray[0];
         String comment = (String) paramArray[1];
-        processEngine.getRuntimeService().createMessageCorrelation(Messages.MSG_PROBLEM_NOT_SOLVED)
+        processEngine
+                .getRuntimeService()
+                .createMessageCorrelation(Messages.MSG_PROBLEM_NOT_SOLVED)
                 .setVariable(Variables.VAR_COMMENT, comment)
                 .processInstanceBusinessKey(String.valueOf(ticketId))
                 .correlateWithResult();
