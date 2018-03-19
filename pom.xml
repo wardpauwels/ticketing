@@ -74,6 +74,13 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
+        <!-- Web starter-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+
         <!-- amqp adapter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

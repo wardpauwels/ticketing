@@ -5,6 +5,7 @@ import be.ward.ticketing.entities.ticketing.Ticket;
 import be.ward.ticketing.entities.user.User;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.Messages;
+import be.ward.ticketing.util.StringResponse;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,16 +24,16 @@ public class AssignController {
     private TicketingService ticketingService;
 
     @PostMapping("/assignusertoticket")
-    public void assignUserToTicket(@RequestParam String ticketId, @RequestParam String assignedUser) {
+    public StringResponse assignUserToTicket(@RequestParam String ticketId, @RequestParam String assignedUser) {
         User user = ticketingService.findUserWithUsername(assignedUser);
 
         if (user != null) {
             Ticket ticket = ticketingService.addResolverToTicket(Long.valueOf(ticketId), user.getUsername());
             rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_RESOLVER_ADDED, ticket.getId());
+            return new StringResponse("User has been added to ticket");
         } else {
             rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_RESOLVER_NOT_FOUND, assignedUser);
+            return new StringResponse("User was not found");
         }
-
-
     }
 }

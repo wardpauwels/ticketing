@@ -32,6 +32,8 @@ public interface TicketingService {
 
     Topic findTopicWithId(Long id);
 
+    Ticket setTicketStatus(Long ticketId, String ticketStatus);
+
     Iterable<Ticket> findTicketsForResolver(String username);
 
     User createUser(String username, String password);
@@ -53,4 +55,6 @@ public interface TicketingService {
     Iterable<Topic> findAllTopics();
 
     Priority findPriorityWithId(Long id);
+
+    Ticket answerOnTicketWithId(Long ticketId, String answer);
 }

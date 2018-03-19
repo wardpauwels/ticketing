@@ -83,6 +83,20 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     @Override
+    public Ticket setTicketStatus(Long ticketId, String ticketStatus) {
+        Ticket ticket = findTicket(ticketId);
+        ticket.setStatus(ticketStatus);
+        return ticketDao.save(ticket);
+    }
+
+    @Override
+    public Ticket answerOnTicketWithId(Long ticketId, String answer) {
+        Ticket ticket = findTicket(ticketId);
+        ticket.setStatus(TicketStatus.ticketAnswered);
+        return ticketDao.save(ticket);
+    }
+
+    @Override
     public Iterable<Ticket> findTicketsForResolver(String username) {
         return ticketDao.findByAssignedUser(username);
     }

@@ -65,26 +65,23 @@ public class TicketController {
     }
 
     @PostMapping("/ticket/{ticketId}/answer")
-    public void answerOnTicketWithId(@PathVariable String ticketId, @RequestParam String answer) {
-        Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
-        ticket.setTopicText(answer);
-        ticket = ticketingService.saveTicket(ticket);
+    public Ticket answerOnTicketWithId(@PathVariable String ticketId, @RequestParam String answer) {
+        Ticket ticket = ticketingService.answerOnTicketWithId(Long.valueOf(ticketId), answer);
         rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_TICKET_ANSWERED, ticket.getId());
+        return ticket;
     }
 
     @PostMapping("/ticketsolved/{ticketId}")
-    public void ticketSolved(@PathVariable String ticketId) {
-        Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
-        ticket.setStatus(TicketStatus.ticketSolved);
-        ticketingService.saveTicket(ticket);
+    public Ticket ticketSolved(@PathVariable String ticketId) {
+        Ticket ticket = ticketingService.setTicketStatus(Long.valueOf(ticketId), TicketStatus.ticketSolved);
         rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_PROBLEM_SOLVED, ticket.getId());
+        return ticket;
     }
 
     @PostMapping("/ticketnotsolved/{ticketId}")
-    public void ticketWasNotSolved(@PathVariable String ticketId, @RequestParam String comment) {
-        Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
-        ticket.setStatus(TicketStatus.ticketNotSolved);
-        ticketingService.saveTicket(ticket);
+    public Ticket ticketWasNotSolved(@PathVariable String ticketId, @RequestParam String comment) {
+        Ticket ticket = ticketingService.setTicketStatus(Long.valueOf(ticketId), TicketStatus.ticketNotSolved);
         rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_PROBLEM_NOT_SOLVED, new Object[]{ticket.getId(), comment});
+        return ticket;
     }
 }

@@ -46,7 +46,8 @@ public class newTicketReceiver {
         variables.put(Variables.VAR_CREATED_AT, ticket.getCreatedAt());
         variables.put(Variables.VAR_STATUS, TicketStatus.newTicket);
 
-        //TODO: load tenant engine dynamically
+        //TODO: load tenant engine
+        //tenantService.getProcessEngine("tenant1")
         processEngine
                 .getRuntimeService()
                 .startProcessInstanceByKey("ticket", String.valueOf(ticket.getId()), variables);
