@@ -2,22 +2,24 @@ package be.ward.ticketing.adapter;
 
 import be.ward.ticketing.entities.ticketing.Ticket;
 import be.ward.ticketing.service.TicketingService;
-import be.ward.ticketing.util.Variables;
+import be.ward.ticketing.util.ticket.Variables;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 import java.util.Date;
 
 @Component
-@ConfigurationProperties
 public class CalculateDueDateAdapter implements JavaDelegate {
 
+    private final TicketingService ticketingService;
+
     @Autowired
-    private TicketingService ticketingService;
+    public CalculateDueDateAdapter(TicketingService ticketingService) {
+        this.ticketingService = ticketingService;
+    }
 
     @Override
     public void execute(DelegateExecution delegateExecution) {

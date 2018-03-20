@@ -1,6 +1,8 @@
 package be.ward.ticketing.service;
 
-import be.ward.ticketing.util.TicketingException;
+import be.ward.ticketing.exception.NoEngineFoundException;
+import be.ward.ticketing.exception.NoProcessDefinitionFoundException;
+import be.ward.ticketing.exception.TicketingException;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
@@ -14,65 +16,67 @@ import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class TenantService {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(TenantService.class);
-
     @Autowired
-    ProcessEngine camunda;
+    private ProcessEngine processEngine;
+
+    @PostConstruct
+    public void startProcesses() {
+        startProcessEngines();
+    }
 
     public String addTenant(String tenantId, String tenantName) {
         if (getTenant(tenantId) == null) {
-            camunda.getIdentityService().saveTenant(createTenant(tenantId, tenantName));
-            return "Tenant has been added to db.";
+            Tenant tenant = createTenant(tenantId, tenantName);
+            processEngine.getIdentityService().saveTenant(tenant);
+            startProcessEngine(tenant.getId());
+            return "Tenant has been added to db and engine has started.";
         } else {
             return "Tenant already exists in db.";
         }
     }
 
-    public Tenant createTenant(String tenantId, String tenantName) {
-        Tenant tenant = camunda.getIdentityService().newTenant(tenantId);
+    private Tenant createTenant(String tenantId, String tenantName) {
+        Tenant tenant = processEngine.getIdentityService().newTenant(tenantId);
         tenant.setName(tenantName);
         return tenant;
     }
 
     public String deleteTenant(String tenantId) {
-        if (getProcessEngine(tenantId) == null) {
-            camunda.getIdentityService().deleteTenant(tenantId);
+        if (!getProcessEngine(tenantId).isPresent()) {
+            processEngine.getIdentityService().deleteTenant(tenantId);
             return "Tenant with id [" + tenantId + "] has been deleted.";
         } else {
             return "Engine for tenant with id [" + tenantId + "] still running";
         }
     }
 
-    public List<Tenant> getAllTenants() {
-        return camunda.getIdentityService().createTenantQuery().orderByTenantId().asc().list();
+    private List<Tenant> getAllTenants() {
+        return processEngine.getIdentityService().createTenantQuery().orderByTenantId().asc().list();
     }
 
-    public Tenant getTenant(String tenantId) {
-        return camunda.getIdentityService().createTenantQuery().tenantId(tenantId).singleResult();
+    private Tenant getTenant(String tenantId) {
+        return processEngine.getIdentityService().createTenantQuery().tenantId(tenantId).singleResult();
     }
 
-    public Tenant getTenantForEngine(String tenantId, ProcessEngine engine) {
+    private Tenant getTenantForEngine(String tenantId, ProcessEngine engine) {
         return engine.getIdentityService().createTenantQuery().tenantId(tenantId).singleResult();
     }
 
     public String startProcessEngines() {
-        for (Tenant tenant : getAllTenants()) {
-            if (getProcessEngine(tenant.getId()) == null) {
-                startProcessEngine(tenant.getId());
-            }
-        }
+        getAllTenants()
+                .stream()
+                .filter(tenant -> !getProcessEngine(tenant.getId()).isPresent())
+                .forEach(tenant -> startProcessEngine(tenant.getId()));
 
         return "All services have been started.";
     }
@@ -108,23 +112,24 @@ public class TenantService {
     }
 
     public String stopProcessEngines() {
-        for (ProcessEngine processEngine : getAllProcessEngines()) {
-            if (!processEngine.getName().equals("default")) {
-                stopProcessEngine(processEngine.getName());
-            }
-        }
+        getAllProcessEngines()
+                .stream()
+                .filter(processEngine -> !processEngine.getName().equals("default"))
+                .forEach(processEngine -> stopProcessEngine(processEngine.getName()));
+
         return "All engines have been stopped.";
     }
 
     public String stopProcessEngine(String engineId) {
         try {
+            if (!getProcessEngine(engineId).isPresent()) throw new NoEngineFoundException();
             RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
-            ProcessEngine processEngine = getProcessEngine(engineId);
+            ProcessEngine processEngine = getProcessEngine(engineId).get();
             processEngine.close();
             runtimeContainerDelegate.unregisterProcessEngine(processEngine);
             return "Process engine with id [" + engineId + "] has been stopped.";
         } catch (TicketingException e) {
-            return "Couldn't stop process engine";
+            return "Couldn't stop process engine. \n e";
         }
     }
 
@@ -133,90 +138,55 @@ public class TenantService {
         ProcessEngineConfigurationImpl defaultProcessEngineConfiguration = ((ProcessEngineImpl) defaultProcessEngine).getProcessEngineConfiguration();
         ProcessApplicationManager defaultProcessApplicationManager = defaultProcessEngineConfiguration.getProcessApplicationManager();
 
-        DeploymentBuilder deploymentBuilder = getProcessEngine(engineId).getRepositoryService().createDeployment();
         List<ProcessDefinition> processDefinitions = defaultProcessEngine.getRepositoryService().createProcessDefinitionQuery().list();
-        ProcessDefinition processDefinition = null;
-        String deploymentId = null;
+        Optional<ProcessEngine> processEngineOptional = getProcessEngine(engineId);
 
-        for (ProcessDefinition definition : processDefinitions) {
-            if ((definition.getKey()).equals(processKey)) {
-                processDefinition = definition;
-                deploymentId = definition.getDeploymentId();
-            }
-        }
+        // if no process engine is found deployment has failed
+        if (!processEngineOptional.isPresent()) throw new NoEngineFoundException();
 
+        DeploymentBuilder deploymentBuilder = processEngineOptional.get().getRepositoryService().createDeployment();
+        Optional<ProcessDefinition> processDefinitionOptional = processDefinitions.stream().filter(definition -> definition.getKey().equals(processKey)).findFirst();
+
+        // if no process definition is found, deployment failed
+        if (!processDefinitionOptional.isPresent()) throw new NoProcessDefinitionFoundException();
+
+        ProcessDefinition processDefinition = processDefinitionOptional.get();
         deploymentBuilder.addInputStream(
                 processDefinition.getResourceName(),
                 defaultProcessEngine
                         .getRepositoryService()
-                        .getResourceAsStream(deploymentId, processDefinition.getResourceName()));
+                        .getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getResourceName()));
+
+        deploymentBuilder.tenantId(engineId);
 
         //deployment
-        Deployment deployment = deploymentBuilder.enableDuplicateFiltering().deploy();
+        Deployment deployment = deploymentBuilder.enableDuplicateFiltering(false).deploy();
 
         //registration
-        String newDeploymentId = deployment.getId();
-
-        ProcessApplicationReference processApplication = defaultProcessApplicationManager.getProcessApplicationForDeployment(deploymentId);
+        ProcessApplicationReference processApplication = defaultProcessApplicationManager.getProcessApplicationForDeployment(processDefinition.getDeploymentId());
         if (processApplication != null) {
-            getProcessEngine(engineId).getManagementService().registerProcessApplication(newDeploymentId, processApplication);
+            processEngineOptional.map(processEngine -> {
+                processEngine.getManagementService().registerProcessApplication(deployment.getId(), processApplication);
+                return "Process [" + processKey + "] successfull deployed to engine [" + engineId + "].";
+            }).orElseThrow(() -> new TicketingException("No ticket found"));
         }
-
-
-        return "Process [" + processKey + "] successfully deployed to engine [" + engineId + "].";
-    }
-
-    public String deployProcessesToEngine(String processKey, String engineId) {
-        try {
-            ProcessEngine defaultProcessEngine = BpmPlatform.getDefaultProcessEngine();
-            ProcessEngineConfigurationImpl defaultProcessEngineConfiguration = ((ProcessEngineImpl) defaultProcessEngine).getProcessEngineConfiguration();
-            ProcessApplicationManager defaultProcessApplicationManager = defaultProcessEngineConfiguration.getProcessApplicationManager();
-
-            Map<String, DeploymentBuilder> deployments = new HashMap<String, DeploymentBuilder>();
-
-            List<ProcessDefinition> processDefinitions = defaultProcessEngine.getRepositoryService().createProcessDefinitionQuery().list();
-            for (ProcessDefinition processDefinition : processDefinitions) {
-                String deploymentId = processDefinition.getDeploymentId();
-
-                if (!deployments.containsKey(deploymentId)) {
-                    deployments.put(deploymentId, getProcessEngine(engineId).getRepositoryService().createDeployment());
-                }
-
-                deployments.get(deploymentId).addInputStream(//
-                        processDefinition.getResourceName(), //
-                        defaultProcessEngine.getRepositoryService().getResourceAsStream(deploymentId, processDefinition.getResourceName()));
-            }
-
-            for (Map.Entry<String, DeploymentBuilder> entry : deployments.entrySet()) {
-                // do the deployment
-                Deployment deployment = entry.getValue().enableDuplicateFiltering().deploy();
-
-                // and registration
-                String defaultExistingDeploymentId = entry.getKey();
-                String newDeploymentId = deployment.getId();
-
-                ProcessApplicationReference processApplication = defaultProcessApplicationManager.getProcessApplicationForDeployment(defaultExistingDeploymentId);
-                if (processApplication != null) {
-                    getProcessEngine(engineId).getManagementService().registerProcessApplication(newDeploymentId, processApplication);
-                } else {
-                    // no Process Application is deployed - ignore
-                }
-
-                // TODO: Resume old versions!
-            }
-
-            return "Process [" + processKey + "] deployed to engine [" + engineId + "].";
-        } catch (TicketingException e) {
-            return "Process [" + processKey + "] not deployed.";
-        }
+        return null;
     }
 
     private List<ProcessEngine> getAllProcessEngines() {
         return RuntimeContainerDelegate.INSTANCE.get().getProcessEngineService().getProcessEngines();
     }
 
-    private ProcessEngine getProcessEngine(String engineId) {
-        return RuntimeContainerDelegate.INSTANCE.get().getProcessEngineService().getProcessEngine(engineId);
+    private Optional<ProcessEngine> getProcessEngine(String engineId) {
+        if (engineId != null) {
+            ProcessEngine processEngine = RuntimeContainerDelegate.INSTANCE.get().getProcessEngineService().getProcessEngine(engineId);
+            if (processEngine != null) {
+                return Optional.of(processEngine);
+            } else {
+                //no process engine running with engineId
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
     }
-
 }

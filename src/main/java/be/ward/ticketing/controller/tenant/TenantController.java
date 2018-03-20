@@ -1,6 +1,7 @@
 package be.ward.ticketing.controller.tenant;
 
 import be.ward.ticketing.service.TenantService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,44 +9,58 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = "/api")
 public class TenantController {
 
     @Autowired
     private TenantService tenantService;
 
-    @PostMapping("/addtenant")
+    @PostMapping(value = "/addtenant")
     private String addTenant(@RequestParam String tenantId, @RequestParam String tenantName) {
-        return tenantService.addTenant(tenantId, tenantName);
+        return new JSONObject()
+                .put("result", tenantService.addTenant(tenantId, tenantName))
+                .toString();
     }
 
-    @PostMapping("/deletetenant")
+    @PostMapping(value = "/deletetenant")
     private String deleteTenant(@RequestParam String tenantId) {
-        return tenantService.deleteTenant(tenantId);
+        return new JSONObject()
+                .put("result", tenantService.deleteTenant(tenantId))
+                .toString();
     }
 
-    @PostMapping("/startengine")
+    @PostMapping(value = "/startengine")
     private String startEngine(@RequestParam String engineId) {
-        return tenantService.startProcessEngine(engineId);
+        return new JSONObject()
+                .put("result", tenantService.startProcessEngine(engineId))
+                .toString();
     }
 
-    @PostMapping("/startengines")
+    @PostMapping(value = "/startengines")
     private String startEngines() {
-        return tenantService.startProcessEngines();
+        return new JSONObject()
+                .put("result", tenantService.startProcessEngines())
+                .toString();
     }
 
-    @PostMapping("/stopengine")
+    @PostMapping(value = "/stopengine")
     private String stopEngine(@RequestParam String engineId) {
-        return tenantService.stopProcessEngine(engineId);
+        return new JSONObject()
+                .put("result", tenantService.stopProcessEngine(engineId))
+                .toString();
     }
 
-    @PostMapping("/stopengines")
+    @PostMapping(value = "/stopengines")
     private String stopEngines() {
-        return tenantService.stopProcessEngines();
+        return new JSONObject()
+                .put("result", tenantService.stopProcessEngines())
+                .toString();
     }
 
-    @PostMapping("/deployprocess")
+    @PostMapping(value = "/deployprocess")
     private String deployProcessToEngine(@RequestParam String processKey, @RequestParam String engineId) {
-        return tenantService.deployProcessToEngine(processKey, engineId);
+        return new JSONObject()
+                .put("result", tenantService.deployProcessToEngine(processKey, engineId))
+                .toString();
     }
 }

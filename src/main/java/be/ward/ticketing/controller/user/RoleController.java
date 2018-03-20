@@ -24,7 +24,6 @@ public class RoleController {
         for (Role role : ticketingService.findAllRoles()) {
             roles.add(role);
         }
-
         return roles;
     }
 }

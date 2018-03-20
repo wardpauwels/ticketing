@@ -26,8 +26,12 @@ public class UserController {
         for (User user : ticketingService.findAllUsers()) {
             users.add(user);
         }
-
         return users;
+    }
+
+    @GetMapping("/user/:userId")
+    public User getUserByUsername(@PathVariable String username) {
+        return ticketingService.findUserWithUsername(username);
     }
 
     @PostMapping("/user")
