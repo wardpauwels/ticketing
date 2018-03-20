@@ -5,11 +5,11 @@ import be.ward.ticketing.entities.ticketing.Ticket;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.ticket.Messages;
 import be.ward.ticketing.util.ticket.TicketStatus;
+import jersey.repackaged.com.google.common.collect.Lists;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,13 +22,6 @@ public class TicketController {
     @Autowired
     private TicketingService ticketingService;
 
-    @PostMapping("/ticket")
-    public Ticket createNewTicket(@RequestParam String username, @RequestParam String message) {
-        Ticket ticket = ticketingService.createTicket(username, message);
-        rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_NEW_TICKET, ticket.getId());
-        return ticket;
-    }
-
     @GetMapping("/ticket/{ticketId}")
     public Ticket findTicketWithId(@PathVariable String ticketId) {
         return ticketingService.findTicket(Long.valueOf(ticketId));
@@ -36,32 +29,24 @@ public class TicketController {
 
     @GetMapping("/tickets")
     public List<Ticket> findAllTickets() {
-        List<Ticket> tickets = new ArrayList<>();
-
-        for (Ticket ticket : ticketingService.findAllTickets()) {
-            tickets.add(ticket);
-        }
-        return tickets;
+        return Lists.newArrayList(ticketingService.findAllTickets());
     }
 
     @GetMapping("/ticketswithoutresolver")
     public List<Ticket> findTicketsWithoutResolver() {
-        List<Ticket> tickets = new ArrayList<>();
-
-        for (Ticket ticket : ticketingService.findTicketsWithoutResolver()) {
-            tickets.add(ticket);
-        }
-        return tickets;
+        return Lists.newArrayList(ticketingService.findTicketsWithoutResolver());
     }
 
     @GetMapping("/ticketsforuser")
     public List<Ticket> getTicketForResolver(@PathVariable String username) {
-        List<Ticket> tickets = new ArrayList<>();
+        return Lists.newArrayList(ticketingService.findTicketsForResolver(username));
+    }
 
-        for (Ticket ticket : ticketingService.findTicketsForResolver(username)) {
-            tickets.add(ticket);
-        }
-        return tickets;
+    @PostMapping("/ticket")
+    public Ticket createNewTicket(@RequestParam String username, @RequestParam String message) {
+        Ticket ticket = ticketingService.createTicket(username, message);
+        rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_NEW_TICKET, ticket.getId());
+        return ticket;
     }
 
     @PostMapping("/ticket/{ticketId}/answer")

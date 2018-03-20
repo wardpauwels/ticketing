@@ -30,6 +30,7 @@ public class ProblemNotSolvedReceiver {
     void sendMessageTicketIsNotSolved(Object[] paramArray) {
         Long ticketId = (Long) paramArray[0];
         String comment = (String) paramArray[1];
+
         processEngine
                 .getRuntimeService()
                 .createMessageCorrelation(Messages.MSG_PROBLEM_NOT_SOLVED)

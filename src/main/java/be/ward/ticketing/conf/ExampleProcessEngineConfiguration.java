@@ -1,5 +1,6 @@
 package be.ward.ticketing.conf;
 
+import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.spring.ProcessEngineFactoryBean;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +10,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 
-public class ProcessEngineConfiguration {
+
+public class ExampleProcessEngineConfiguration {
     @Bean
     public DataSource dataSource() {
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
@@ -32,9 +34,9 @@ public class ProcessEngineConfiguration {
         config.setDataSource(dataSource());
         config.setTransactionManager(transactionManager());
 
-        config.setDatabaseSchemaUpdate("true");
-        config.setHistory("audit");
-        config.setJobExecutorActivate(true);
+        config.setDatabaseSchemaUpdate(StandaloneProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        config.setHistory(StandaloneProcessEngineConfiguration.HISTORY_AUDIT);
+        config.setJobExecutorDeploymentAware(true);
 
         return config;
     }

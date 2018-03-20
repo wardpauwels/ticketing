@@ -1,10 +1,9 @@
 package be.ward.ticketing.entities.ticketing;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity(name = "association")
-public class Association implements Serializable {
+public class Association {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

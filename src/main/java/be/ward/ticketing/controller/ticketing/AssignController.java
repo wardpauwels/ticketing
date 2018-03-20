@@ -2,7 +2,6 @@ package be.ward.ticketing.controller.ticketing;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.entities.ticketing.Ticket;
-import be.ward.ticketing.entities.user.User;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.ticket.Messages;
 import org.json.JSONObject;
@@ -25,10 +24,9 @@ public class AssignController {
 
     @PostMapping("/assignusertoticket")
     public String assignUserToTicket(@RequestParam String ticketId, @RequestParam String assignedUser) {
-        User user = ticketingService.findUserWithUsername(assignedUser);
+        Ticket ticket = ticketingService.addResolverToTicket(Long.valueOf(ticketId), assignedUser);
 
-        if (user != null) {
-            Ticket ticket = ticketingService.addResolverToTicket(Long.valueOf(ticketId), user.getUsername());
+        if (ticket != null) {
             rabbitTemplate.convertAndSend(SpringBeansConfiguration.exchangeName, Messages.MSG_RESOLVER_ADDED, ticket.getId());
             return makeJsonOject("User has been added to ticket");
         } else {
@@ -37,7 +35,7 @@ public class AssignController {
         }
     }
 
-    public String makeJsonOject(String resultString) {
+    private String makeJsonOject(String resultString) {
         return new JSONObject()
                 .put("result", resultString)
                 .toString();

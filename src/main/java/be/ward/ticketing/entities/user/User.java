@@ -1,16 +1,9 @@
 package be.ward.ticketing.entities.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import javax.persistence.*;
 
 @Entity(name = "user")
 public class User {
-
-    @Transient
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,7 +25,7 @@ public class User {
 
     public User(String username, String password) {
         this.username = username;
-        this.password = passwordEncoder.encode(password);
+        this.password = password;
     }
 
     public Long getId() {

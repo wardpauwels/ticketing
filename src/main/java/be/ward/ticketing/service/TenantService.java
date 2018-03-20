@@ -2,6 +2,7 @@ package be.ward.ticketing.service;
 
 import be.ward.ticketing.exception.NoEngineFoundException;
 import be.ward.ticketing.exception.NoProcessDefinitionFoundException;
+import be.ward.ticketing.exception.ProcessEngineException;
 import be.ward.ticketing.exception.TicketingException;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -17,6 +18,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +30,15 @@ public class TenantService {
 
     @Autowired
     private ProcessEngine processEngine;
+
+    @Value("${spring.datasource.username}")
+    private String databaseUsername;
+
+    @Value("${spring.datasource.password}")
+    private String databasePassword;
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String databaseDriverClassName;
 
     @PostConstruct
     public void startProcesses() {
@@ -84,14 +95,13 @@ public class TenantService {
     public String startProcessEngine(String engineId) {
         try {
             ProcessEngineConfigurationImpl configuration = new StandaloneProcessEngineConfiguration();
+
             configuration.setIdGenerator(new StrongUuidGenerator());
-
             configuration.setProcessEngineName(engineId);
-
-            configuration.setJdbcDriver("com.mysql.jdbc.Driver");
+            configuration.setJdbcDriver(databaseDriverClassName);
             configuration.setJdbcUrl("jdbc:mysql://localhost:3306/db_ticketingsystem_" + engineId + "?useSSL=false&createDatabaseIfNotExist=true");
-            configuration.setJdbcUsername("ticketmaster");
-            configuration.setJdbcPassword("mJ2CEk9EA7rDrNp0");
+            configuration.setJdbcUsername(databaseUsername);
+            configuration.setJdbcPassword(databasePassword);
             configuration.setDatabaseSchemaUpdate(StandaloneProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
             configuration.setJobExecutorDeploymentAware(true);
             configuration.setHistory(StandaloneProcessEngineConfiguration.HISTORY_AUDIT);
@@ -106,8 +116,8 @@ public class TenantService {
             }
 
             return "Process engine with id [" + engineId + "] has started.";
-        } catch (TicketingException e) {
-            return "Couldn't start process engine";
+        } catch (ProcessEngineException e) {
+            throw new ProcessEngineException("Couldn't start process engine");
         }
     }
 
@@ -123,10 +133,12 @@ public class TenantService {
     public String stopProcessEngine(String engineId) {
         try {
             if (!getProcessEngine(engineId).isPresent()) throw new NoEngineFoundException();
-            RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
             ProcessEngine processEngine = getProcessEngine(engineId).get();
+            RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
+
             processEngine.close();
             runtimeContainerDelegate.unregisterProcessEngine(processEngine);
+
             return "Process engine with id [" + engineId + "] has been stopped.";
         } catch (TicketingException e) {
             return "Couldn't stop process engine. \n e";
@@ -145,7 +157,10 @@ public class TenantService {
         if (!processEngineOptional.isPresent()) throw new NoEngineFoundException();
 
         DeploymentBuilder deploymentBuilder = processEngineOptional.get().getRepositoryService().createDeployment();
-        Optional<ProcessDefinition> processDefinitionOptional = processDefinitions.stream().filter(definition -> definition.getKey().equals(processKey)).findFirst();
+        Optional<ProcessDefinition> processDefinitionOptional = processDefinitions
+                .stream()
+                .filter(definition -> definition.getKey().equals(processKey))
+                .findFirst();
 
         // if no process definition is found, deployment failed
         if (!processDefinitionOptional.isPresent()) throw new NoProcessDefinitionFoundException();
@@ -165,10 +180,11 @@ public class TenantService {
         //registration
         ProcessApplicationReference processApplication = defaultProcessApplicationManager.getProcessApplicationForDeployment(processDefinition.getDeploymentId());
         if (processApplication != null) {
-            processEngineOptional.map(processEngine -> {
-                processEngine.getManagementService().registerProcessApplication(deployment.getId(), processApplication);
-                return "Process [" + processKey + "] successfull deployed to engine [" + engineId + "].";
-            }).orElseThrow(() -> new TicketingException("No ticket found"));
+            processEngineOptional
+                    .map(processEngine -> {
+                        processEngine.getManagementService().registerProcessApplication(deployment.getId(), processApplication);
+                        return "Process [" + processKey + "] successfull deployed to engine [" + engineId + "].";
+                    });
         }
         return null;
     }
@@ -178,15 +194,12 @@ public class TenantService {
     }
 
     private Optional<ProcessEngine> getProcessEngine(String engineId) {
-        if (engineId != null) {
-            ProcessEngine processEngine = RuntimeContainerDelegate.INSTANCE.get().getProcessEngineService().getProcessEngine(engineId);
-            if (processEngine != null) {
-                return Optional.of(processEngine);
-            } else {
-                //no process engine running with engineId
-                return Optional.empty();
-            }
+        ProcessEngine processEngine = RuntimeContainerDelegate.INSTANCE.get().getProcessEngineService().getProcessEngine(engineId);
+        if (processEngine != null) {
+            return Optional.of(processEngine);
+        } else {
+            //no process engine running with engineId
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }

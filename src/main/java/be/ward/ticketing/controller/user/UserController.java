@@ -2,11 +2,11 @@ package be.ward.ticketing.controller.user;
 
 import be.ward.ticketing.entities.user.User;
 import be.ward.ticketing.service.TicketingService;
+import jersey.repackaged.com.google.common.collect.Lists;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,12 +21,7 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> getAllUsers() {
-        List<User> users = new ArrayList<>();
-
-        for (User user : ticketingService.findAllUsers()) {
-            users.add(user);
-        }
-        return users;
+        return Lists.newArrayList(ticketingService.findAllUsers());
     }
 
     @GetMapping("/user/:userId")

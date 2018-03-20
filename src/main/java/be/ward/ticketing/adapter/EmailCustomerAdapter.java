@@ -30,13 +30,14 @@ public class EmailCustomerAdapter implements JavaDelegate {
     @Override
     public void execute(DelegateExecution delegateExecution) {
         Ticket ticket = ticketingService.findTicket((Long) delegateExecution.getVariable(Variables.VAR_TICKET_ID));
-        SendMailTLS mail = new SendMailTLS();
+
         //TODO: Get mail address from the user
-        mail.sendMail(
+        SendMailTLS.sendMail(
                 mailTo,
                 mailSubject,
                 "Your ticket has been answered.\n Your question was: \n" + ticket.getDescription()
         );
+
         delegateExecution.setVariable(Variables.VAR_STATUS, TicketStatus.mailSent);
     }
 }

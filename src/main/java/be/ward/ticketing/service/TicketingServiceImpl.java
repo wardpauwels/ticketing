@@ -8,6 +8,7 @@ import be.ward.ticketing.entities.user.Role;
 import be.ward.ticketing.entities.user.User;
 import be.ward.ticketing.util.ticket.TicketStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -17,6 +18,8 @@ public class TicketingServiceImpl implements TicketingService {
 
     @Autowired
     private DomainDao domainDao;
+    @Autowired
+    private PasswordEncoder encoder;
     @Autowired
     private PriorityDao priorityDao;
     @Autowired
@@ -72,10 +75,14 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     @Override
-    public Ticket addResolverToTicket(Long ticketId, String assignedUser) {
+    public Ticket addResolverToTicket(Long ticketId, String username) {
         Ticket ticket = findTicket(ticketId);
-        ticket.setAssignedUser(assignedUser);
-        return ticketDao.save(ticket);
+        User user = userDao.findUserByUsername(username);
+
+        if (user != null) {
+            ticket.setAssignedUser(username);
+            return ticketDao.save(ticket);
+        } else return null;
     }
 
     @Override
@@ -175,7 +182,7 @@ public class TicketingServiceImpl implements TicketingService {
 
     @Override
     public User createUser(String username, String password) {
-        User user = new User(username, password);
+        User user = new User(username, encoder.encode(password));
         return userDao.save(user);
     }
 
