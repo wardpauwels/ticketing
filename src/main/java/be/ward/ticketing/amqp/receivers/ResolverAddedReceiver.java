@@ -1,12 +1,10 @@
 package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
-import be.ward.ticketing.entities.ticketing.Ticket;
-import be.ward.ticketing.service.TenantService;
 import be.ward.ticketing.service.TicketingService;
-import be.ward.ticketing.util.Messages;
-import be.ward.ticketing.util.TicketStatus;
-import be.ward.ticketing.util.Variables;
+import be.ward.ticketing.util.ticket.Messages;
+import be.ward.ticketing.util.ticket.TicketStatus;
+import be.ward.ticketing.util.ticket.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -21,16 +19,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class resolverAddedReceiver {
+public class ResolverAddedReceiver {
+
+    private final TicketingService ticketingService;
+    private final ProcessEngine processEngine;
 
     @Autowired
-    private TicketingService ticketingService;
-
-    @Autowired
-    private ProcessEngine processEngine;
-
-    @Autowired
-    private TenantService tenantService;
+    public ResolverAddedReceiver(TicketingService ticketingService, ProcessEngine processEngine) {
+        this.ticketingService = ticketingService;
+        this.processEngine = processEngine;
+    }
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = Messages.MSG_RESOLVER_ADDED, durable = "true"),
@@ -38,16 +36,12 @@ public class resolverAddedReceiver {
             key = Messages.MSG_RESOLVER_ADDED))
     @Transactional
     void sendMessageResolverIsAssignedToTicket(String ticketId) {
+        String assignedUser = ticketingService.findTicket(Long.valueOf(ticketId)).getAssignedUser();
+
+        Task task = processEngine.getTaskService().createTaskQuery()
+                .processInstanceBusinessKey(ticketId).singleResult();
+
         Map<String, Object> variables = new HashMap<>();
-        Ticket ticket = ticketingService.findTicket(Long.valueOf(ticketId));
-        String assignedUser = ticket.getAssignedUser();
-
-        Task task = processEngine
-                .getTaskService()
-                .createTaskQuery()
-                .processInstanceBusinessKey(ticketId)
-                .singleResult();
-
         variables.put(Variables.VAR_ASSIGNED_USER, assignedUser);
         variables.put(Variables.VAR_STATUS, TicketStatus.resolverAssigned);
 
@@ -55,5 +49,4 @@ public class resolverAddedReceiver {
                 .getTaskService()
                 .complete(task.getId(), variables);
     }
-
 }

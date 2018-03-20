@@ -6,7 +6,7 @@ import be.ward.ticketing.data.user.UserDao;
 import be.ward.ticketing.entities.ticketing.*;
 import be.ward.ticketing.entities.user.Role;
 import be.ward.ticketing.entities.user.User;
-import be.ward.ticketing.util.TicketStatus;
+import be.ward.ticketing.util.ticket.TicketStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +15,6 @@ import java.util.Date;
 @Service
 public class TicketingServiceImpl implements TicketingService {
 
-    @Autowired
-    private AssociationDao associationDao;
     @Autowired
     private DomainDao domainDao;
     @Autowired
@@ -33,8 +31,6 @@ public class TicketingServiceImpl implements TicketingService {
     private TopicDao topicDao;
     @Autowired
     private UserDao userDao;
-
-    // ASSOCIATIONS
 
     // TICKETS
     @Override
@@ -71,8 +67,8 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     @Override
-    public Ticket saveTicket(Ticket ticket) {
-        return ticketDao.save(ticket);
+    public void saveTicket(Ticket ticket) {
+        ticketDao.save(ticket);
     }
 
     @Override
@@ -93,6 +89,7 @@ public class TicketingServiceImpl implements TicketingService {
     public Ticket answerOnTicketWithId(Long ticketId, String answer) {
         Ticket ticket = findTicket(ticketId);
         ticket.setStatus(TicketStatus.ticketAnswered);
+        ticket.setTopicText(answer);
         return ticketDao.save(ticket);
     }
 

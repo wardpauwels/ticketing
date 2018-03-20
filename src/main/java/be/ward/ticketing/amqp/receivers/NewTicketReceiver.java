@@ -2,11 +2,10 @@ package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
 import be.ward.ticketing.entities.ticketing.Ticket;
-import be.ward.ticketing.service.TenantService;
 import be.ward.ticketing.service.TicketingService;
-import be.ward.ticketing.util.Messages;
-import be.ward.ticketing.util.TicketStatus;
-import be.ward.ticketing.util.Variables;
+import be.ward.ticketing.util.ticket.Messages;
+import be.ward.ticketing.util.ticket.TicketStatus;
+import be.ward.ticketing.util.ticket.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
@@ -20,16 +19,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class newTicketReceiver {
+public class NewTicketReceiver {
+
+    private final TicketingService ticketingService;
+    private final ProcessEngine processEngine;
 
     @Autowired
-    private TicketingService ticketingService;
-
-    @Autowired
-    private TenantService tenantService;
-
-    @Autowired
-    private ProcessEngine processEngine;
+    public NewTicketReceiver(TicketingService ticketingService, ProcessEngine processEngine) {
+        this.ticketingService = ticketingService;
+        this.processEngine = processEngine;
+    }
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = Messages.MSG_NEW_TICKET, durable = "true"),
@@ -46,11 +45,8 @@ public class newTicketReceiver {
         variables.put(Variables.VAR_CREATED_AT, ticket.getCreatedAt());
         variables.put(Variables.VAR_STATUS, TicketStatus.newTicket);
 
-        //TODO: load tenant engine
-        //tenantService.getProcessEngine("tenant1")
         processEngine
                 .getRuntimeService()
                 .startProcessInstanceByKey("ticket", String.valueOf(ticket.getId()), variables);
     }
-
 }

@@ -1,9 +1,8 @@
 package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
-import be.ward.ticketing.service.TenantService;
-import be.ward.ticketing.util.Messages;
-import be.ward.ticketing.util.Variables;
+import be.ward.ticketing.util.ticket.Messages;
+import be.ward.ticketing.util.ticket.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
@@ -14,13 +13,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class problemNotSolvedReceiver {
+public class ProblemNotSolvedReceiver {
+
+    private final ProcessEngine processEngine;
 
     @Autowired
-    private ProcessEngine processEngine;
-
-    @Autowired
-    private TenantService tenantService;
+    public ProblemNotSolvedReceiver(ProcessEngine processEngine) {
+        this.processEngine = processEngine;
+    }
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = Messages.MSG_PROBLEM_NOT_SOLVED, durable = "true"),

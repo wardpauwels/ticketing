@@ -3,11 +3,8 @@ package be.ward.ticketing.service;
 import be.ward.ticketing.entities.ticketing.*;
 import be.ward.ticketing.entities.user.Role;
 import be.ward.ticketing.entities.user.User;
-import org.springframework.stereotype.Service;
 
-@Service
 public interface TicketingService {
-
 
     // TICKETS
     Ticket createTicket(String username, String message);
@@ -18,7 +15,7 @@ public interface TicketingService {
 
     Iterable<Ticket> findAllTickets();
 
-    Ticket saveTicket(Ticket ticket);
+    void saveTicket(Ticket ticket);
 
     Ticket addResolverToTicket(Long ticketId, String assignedUser);
 
@@ -26,13 +23,13 @@ public interface TicketingService {
 
     Priority findPriorityByName(String name);
 
-    Source findSourceWithId(Long id);
-
     TicketType findTicketTypeWithId(Long id);
 
     Topic findTopicWithId(Long id);
 
     Ticket setTicketStatus(Long ticketId, String ticketStatus);
+
+    Ticket answerOnTicketWithId(Long ticketId, String answer);
 
     Iterable<Ticket> findTicketsForResolver(String username);
 
@@ -50,11 +47,12 @@ public interface TicketingService {
 
     Iterable<Source> findAllSources();
 
+    Source findSourceWithId(Long id);
+
     Iterable<TicketType> findAllTicketTypes();
 
     Iterable<Topic> findAllTopics();
 
     Priority findPriorityWithId(Long id);
 
-    Ticket answerOnTicketWithId(Long ticketId, String answer);
 }

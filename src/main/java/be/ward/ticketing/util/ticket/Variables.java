@@ -1,4 +1,4 @@
-package be.ward.ticketing.util;
+package be.ward.ticketing.util.ticket;
 
 public class Variables {
 
