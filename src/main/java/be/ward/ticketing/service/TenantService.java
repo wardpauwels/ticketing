@@ -96,15 +96,15 @@ public class TenantService {
         try {
             ProcessEngineConfigurationImpl configuration = new StandaloneProcessEngineConfiguration();
 
+            configuration.setDatabaseSchemaUpdate(StandaloneProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+            configuration.setHistory(StandaloneProcessEngineConfiguration.HISTORY_AUDIT);
             configuration.setIdGenerator(new StrongUuidGenerator());
-            configuration.setProcessEngineName(engineId);
             configuration.setJdbcDriver(databaseDriverClassName);
             configuration.setJdbcUrl("jdbc:mysql://localhost:3306/db_ticketingsystem_" + engineId + "?useSSL=false&createDatabaseIfNotExist=true");
             configuration.setJdbcUsername(databaseUsername);
             configuration.setJdbcPassword(databasePassword);
-            configuration.setDatabaseSchemaUpdate(StandaloneProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
             configuration.setJobExecutorDeploymentAware(true);
-            configuration.setHistory(StandaloneProcessEngineConfiguration.HISTORY_AUDIT);
+            configuration.setProcessEngineName(engineId);
 
             ProcessEngine processEngine = configuration.buildProcessEngine();
 
@@ -174,10 +174,10 @@ public class TenantService {
 
         deploymentBuilder.tenantId(engineId);
 
-        //deployment
-        Deployment deployment = deploymentBuilder.enableDuplicateFiltering(false).deploy();
+        // deployment of engine
+        Deployment deployment = deployEngine(deploymentBuilder);
 
-        //registration
+        // registration of engine
         ProcessApplicationReference processApplication = defaultProcessApplicationManager.getProcessApplicationForDeployment(processDefinition.getDeploymentId());
         if (processApplication != null) {
             processEngineOptional
@@ -201,5 +201,9 @@ public class TenantService {
             //no process engine running with engineId
             return Optional.empty();
         }
+    }
+
+    private Deployment deployEngine(DeploymentBuilder deploymentBuilder) {
+        return deploymentBuilder.enableDuplicateFiltering(false).deploy();
     }
 }
