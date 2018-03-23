@@ -2,7 +2,7 @@ package be.ward.ticketing.adapter;
 
 import be.ward.ticketing.entities.ticketing.Ticket;
 import be.ward.ticketing.service.TicketingService;
-import be.ward.ticketing.util.ticket.Variables;
+import be.ward.ticketing.util.ticket.Constants;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +23,16 @@ public class CalculateDueDateAdapter implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution delegateExecution) {
-        Ticket ticket = ticketingService.findTicket((Long) delegateExecution.getVariable(Variables.VAR_TICKET_ID));
-        int days = (int) delegateExecution.getVariable(Variables.VAR_DUE_AT_DAYS);
+        Ticket ticket = ticketingService.findTicket((Long) delegateExecution.getVariable(Constants.VAR_TICKET_ID));
+        int days = (int) delegateExecution.getVariable(Constants.VAR_DUE_AT_DAYS);
         ticket.setDueAt(getDatePlusDays(ticket.getCreatedAt(), days));
-
-        delegateExecution.setVariable(Variables.VAR_DUE_AT, ticket.getDueAt());
+        ticketingService.saveTicket(ticket);
     }
 
     public Date getDatePlusDays(Date date, int days) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.add(Calendar.DATE, days); //minus number would decrement the days
+        cal.add(Calendar.DATE, days); //negative days will decrement the days
         return cal.getTime();
     }
 }

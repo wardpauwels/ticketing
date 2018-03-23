@@ -1,6 +1,8 @@
 package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
+import be.ward.ticketing.entities.ticketing.Ticket;
+import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.ticket.Messages;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -14,11 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class TicketAnsweredReceiver {
 
+    private final TicketingService ticketingService;
+
     private final ProcessEngine processEngine;
 
     @Autowired
-    public TicketAnsweredReceiver(ProcessEngine processEngine) {
+    public TicketAnsweredReceiver(ProcessEngine processEngine, TicketingService ticketingService) {
         this.processEngine = processEngine;
+        this.ticketingService = ticketingService;
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -26,11 +31,13 @@ public class TicketAnsweredReceiver {
             exchange = @Exchange(value = SpringBeansConfiguration.exchangeName, type = "topic", durable = "true"),
             key = Messages.MSG_TICKET_ANSWERED))
     @Transactional
-    void sendMessageTicketIsAnswered(String ticketId) {
+    void sendMessageTicketIsAnswered(String mainTicketId) {
+        Ticket mainTicket = ticketingService.findTicket(Long.valueOf(mainTicketId));
+
         processEngine
                 .getRuntimeService()
                 .createMessageCorrelation(Messages.MSG_TICKET_ANSWERED)
-                .processInstanceBusinessKey(ticketId)
+                .processInstanceBusinessKey(String.valueOf(mainTicket.getId()))
                 .correlateWithResult();
     }
 }

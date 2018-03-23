@@ -6,7 +6,10 @@ import be.ward.ticketing.entities.user.User;
 
 public interface TicketingService {
 
-    // TICKETS
+    Association findAssociationByTicket(Ticket ticket);
+
+    Association findAssociationByAssociation(Association association);
+
     Ticket createTicket(String username, String message);
 
     Ticket findTicket(Long id);
@@ -23,13 +26,11 @@ public interface TicketingService {
 
     Priority findPriorityByName(String name);
 
-    TicketType findTicketTypeWithId(Long id);
-
     Topic findTopicWithId(Long id);
 
     Ticket setTicketStatus(Long ticketId, String ticketStatus);
 
-    Ticket answerOnTicketWithId(Long ticketId, String answer);
+    Ticket answerOnTicketWithId(Long ticketId, String user, String answer);
 
     Iterable<Ticket> findTicketsForResolver(String username);
 
@@ -51,8 +52,19 @@ public interface TicketingService {
 
     Iterable<TicketType> findAllTicketTypes();
 
+    TicketType findTicketTypeWithId(Long id);
+
     Iterable<Topic> findAllTopics();
 
     Priority findPriorityWithId(Long id);
 
+    Association createAssociation(String associationType, Ticket ticket);
+
+    Association linkNewAssociationToAssociation(Association newAssociation, Association oldAssociation);
+
+    Association getTopAssociationFromTicket(Ticket ticket);
+
+    Association getLastAssociationFromTicket(Ticket ticket);
+
+    Association findAssociationById(Long associationId);
 }

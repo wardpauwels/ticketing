@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "adapter.mail.to",
+      "type": "java.lang.String",
+      "description": "Description for adapter.mail.to."
+    },
+    {
+      "name": "adapter.mail.subject",
+      "type": "java.lang.String",
+      "description": "Description for adapter.mail.subject."
+    }
+  ]
+}

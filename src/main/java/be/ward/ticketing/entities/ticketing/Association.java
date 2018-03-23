@@ -20,9 +20,51 @@ public class Association {
     @Column(name = "association_type")
     private String associationType;
 
-    @OneToOne(optional = false)
+    @OneToOne
     @JoinColumn(name = "association_id")
     private Association association;
 
+    public Association() {
+    }
 
+    public Association(String associationType, Ticket ticket) {
+        this.associationType = associationType;
+        this.ticket = ticket;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Integer getLockVersion() {
+        return lockVersion;
+    }
+
+    public void setLockVersion(Integer lockVersion) {
+        this.lockVersion = lockVersion;
+    }
+
+    public Ticket getTicket() {
+        return ticket;
+    }
+
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
+    }
+
+    public String getAssociationType() {
+        return associationType;
+    }
+
+    public void setAssociationType(String associationType) {
+        this.associationType = associationType;
+    }
+
+    public Association getAssociation() {
+        return association;
+    }
+
+    public void setAssociation(Association association) {
+        this.association = association;
+    }
 }

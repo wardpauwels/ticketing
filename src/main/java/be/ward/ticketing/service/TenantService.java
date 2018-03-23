@@ -94,17 +94,7 @@ public class TenantService {
 
     public String startProcessEngine(String engineId) {
         try {
-            ProcessEngineConfigurationImpl configuration = new StandaloneProcessEngineConfiguration();
-
-            configuration.setDatabaseSchemaUpdate(StandaloneProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-            configuration.setHistory(StandaloneProcessEngineConfiguration.HISTORY_AUDIT);
-            configuration.setIdGenerator(new StrongUuidGenerator());
-            configuration.setJdbcDriver(databaseDriverClassName);
-            configuration.setJdbcUrl("jdbc:mysql://localhost:3306/db_ticketingsystem_" + engineId + "?useSSL=false&createDatabaseIfNotExist=true");
-            configuration.setJdbcUsername(databaseUsername);
-            configuration.setJdbcPassword(databasePassword);
-            configuration.setJobExecutorDeploymentAware(true);
-            configuration.setProcessEngineName(engineId);
+            ProcessEngineConfigurationImpl configuration = newProcessConfiguration(engineId);
 
             ProcessEngine processEngine = configuration.buildProcessEngine();
 
@@ -119,6 +109,22 @@ public class TenantService {
         } catch (ProcessEngineException e) {
             throw new ProcessEngineException("Couldn't start process engine");
         }
+    }
+
+    private ProcessEngineConfigurationImpl newProcessConfiguration(String engineId) {
+        ProcessEngineConfigurationImpl config = new StandaloneProcessEngineConfiguration();
+
+        config.setDatabaseSchemaUpdate(StandaloneProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        config.setHistory(StandaloneProcessEngineConfiguration.HISTORY_AUDIT);
+        config.setIdGenerator(new StrongUuidGenerator());
+        config.setJdbcDriver(databaseDriverClassName);
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/db_ticketingsystem_" + engineId + "?useSSL=false&createDatabaseIfNotExist=true");
+        config.setJdbcUsername(databaseUsername);
+        config.setJdbcPassword(databasePassword);
+        config.setJobExecutorDeploymentAware(true);
+        config.setProcessEngineName(engineId);
+
+        return config;
     }
 
     public String stopProcessEngines() {
@@ -153,7 +159,7 @@ public class TenantService {
         List<ProcessDefinition> processDefinitions = defaultProcessEngine.getRepositoryService().createProcessDefinitionQuery().list();
         Optional<ProcessEngine> processEngineOptional = getProcessEngine(engineId);
 
-        // if no process engine is found deployment has failed
+        // if no process engine is found, deployment has failed
         if (!processEngineOptional.isPresent()) throw new NoEngineFoundException();
 
         DeploymentBuilder deploymentBuilder = processEngineOptional.get().getRepositoryService().createDeployment();
@@ -174,17 +180,12 @@ public class TenantService {
 
         deploymentBuilder.tenantId(engineId);
 
-        // deployment of engine
-        Deployment deployment = deployEngine(deploymentBuilder);
+        // deployment of process
+        Deployment deployment = deployProcess(deploymentBuilder);
 
-        // registration of engine
-        ProcessApplicationReference processApplication = defaultProcessApplicationManager.getProcessApplicationForDeployment(processDefinition.getDeploymentId());
-        if (processApplication != null) {
-            processEngineOptional
-                    .map(processEngine -> {
-                        processEngine.getManagementService().registerProcessApplication(deployment.getId(), processApplication);
-                        return "Process [" + processKey + "] successfull deployed to engine [" + engineId + "].";
-                    });
+        // registration of process
+        if (registerProcess(defaultProcessApplicationManager, processDefinition, processEngineOptional.get(), deployment)) {
+            return "Process [" + processKey + "] successfull deployed to engine [" + engineId + "].";
         }
         return null;
     }
@@ -203,7 +204,17 @@ public class TenantService {
         }
     }
 
-    private Deployment deployEngine(DeploymentBuilder deploymentBuilder) {
+    private Deployment deployProcess(DeploymentBuilder deploymentBuilder) {
         return deploymentBuilder.enableDuplicateFiltering(false).deploy();
+    }
+
+    private Boolean registerProcess(ProcessApplicationManager processApplicationManager, ProcessDefinition processDefinition, ProcessEngine processEngine, Deployment deployment) {
+        ProcessApplicationReference processApplication = processApplicationManager.getProcessApplicationForDeployment(processDefinition.getDeploymentId());
+        if (processApplication != null) {
+            processEngine.getManagementService().registerProcessApplication(deployment.getId(), processApplication);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

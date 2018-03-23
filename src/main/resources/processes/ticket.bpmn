@@ -14,6 +14,7 @@
     <bpmn:sequenceFlow id="SequenceFlow_0ksectj" sourceRef="BusinessRule_AssignResolversGroup" targetRef="ExclusiveGateway_0oimea5" />
     <bpmn:businessRuleTask id="BusinessRule_SetPriority" name="Set Priority" camunda:resultVariable="priority" camunda:decisionRef="setPriority" camunda:mapDecisionResult="singleEntry">
       <bpmn:incoming>SequenceFlow_0i3khgv</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1c5s46o</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_197b54v</bpmn:outgoing>
     </bpmn:businessRuleTask>
     <bpmn:businessRuleTask id="BusinessRule_SetDueDate" name="Set Due Date" camunda:resultVariable="due_at_days" camunda:decisionRef="setDueDate" camunda:mapDecisionResult="singleEntry">
@@ -82,7 +83,7 @@
       <bpmn:incoming>SequenceFlow_017de43</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0urwe3h</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:receiveTask id="ReceiveMessage_ResolveTicket" name="Resolve Ticket" messageRef="Message_1azo5xm">
+    <bpmn:receiveTask id="ReceiveMessage_ResolveTicket" name="Answer Ticket" messageRef="Message_1azo5xm">
       <bpmn:incoming>SequenceFlow_00lazqf</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_017de43</bpmn:outgoing>
     </bpmn:receiveTask>
@@ -109,7 +110,7 @@
       </bpmn:sendTask>
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="SequenceFlow_00lazqf" sourceRef="ServiceTask_UpdateTicketsDB" targetRef="ReceiveMessage_ResolveTicket" />
-    <bpmn:serviceTask id="ServiceTask_UpdateTicketsDB" name="Update Tickets DB" camunda:delegateExpression="${updateTicketsDbAdapter}">
+    <bpmn:serviceTask id="ServiceTask_UpdateTicketsDB" name="Update Ticket in DB" camunda:delegateExpression="${updateTicketsDbAdapter}">
       <bpmn:incoming>SequenceFlow_0vk3z4c</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_00lazqf</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -137,12 +138,9 @@
     <bpmn:sequenceFlow id="SequenceFlow_0t5armo" sourceRef="IntermediateCatchEvent_ProblemNotSolved" targetRef="Task_TicketNotSolved" />
     <bpmn:serviceTask id="Task_TicketNotSolved" name="Open New Ticket" camunda:delegateExpression="${ticketNotSolvedAdapter}">
       <bpmn:incoming>SequenceFlow_0t5armo</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1b3hgo5</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1c5s46o</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:endEvent id="EndEvent_0ihn8rj" name="New ticket will solve problem">
-      <bpmn:incoming>SequenceFlow_1b3hgo5</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_1b3hgo5" sourceRef="Task_TicketNotSolved" targetRef="EndEvent_0ihn8rj" />
+    <bpmn:sequenceFlow id="SequenceFlow_1c5s46o" sourceRef="Task_TicketNotSolved" targetRef="BusinessRule_SetPriority" />
   </bpmn:process>
   <bpmn:message id="Message_1azo5xm" name="ticketAnswered" />
   <bpmn:message id="Message_1nulf02" name="problemSolved" />
@@ -227,7 +225,7 @@
         <di:waypoint xsi:type="dc:Point" x="964" y="181" />
         <di:waypoint xsi:type="dc:Point" x="1027" y="181" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="939" y="196" width="82" height="12" />
+          <dc:Bounds x="923" y="191" width="82" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_0szmqie_di" bpmnElement="ExclusiveGateway_0szmqie" isMarkerVisible="true">
@@ -293,9 +291,9 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_017de43_di" bpmnElement="SequenceFlow_017de43">
         <di:waypoint xsi:type="dc:Point" x="1761" y="120" />
-        <di:waypoint xsi:type="dc:Point" x="1812" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1825" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1742" y="99" width="90" height="12" />
+          <dc:Bounds x="1748" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0i3khgv_di" bpmnElement="SequenceFlow_0i3khgv">
@@ -309,14 +307,14 @@
         <dc:Bounds x="115" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0urwe3h_di" bpmnElement="SequenceFlow_0urwe3h">
-        <di:waypoint xsi:type="dc:Point" x="1912" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="1925" y="120" />
         <di:waypoint xsi:type="dc:Point" x="1986" y="120" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1904" y="99" width="90" height="12" />
+          <dc:Bounds x="1910.5" y="99" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1yixrej_di" bpmnElement="ServiceTask_EmailCustomer">
-        <dc:Bounds x="1812" y="80" width="100" height="80" />
+        <dc:Bounds x="1825" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ReceiveTask_1hm0q25_di" bpmnElement="ReceiveMessage_ResolveTicket">
         <dc:Bounds x="1661" y="80" width="100" height="80" />
@@ -434,17 +432,12 @@
       <bpmndi:BPMNShape id="ServiceTask_0a7pt2t_di" bpmnElement="Task_TicketNotSolved">
         <dc:Bounds x="1961" y="-149" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0ihn8rj_di" bpmnElement="EndEvent_0ihn8rj">
-        <dc:Bounds x="1993" y="-227.938443670151" width="36" height="36" />
+      <bpmndi:BPMNEdge id="SequenceFlow_1c5s46o_di" bpmnElement="SequenceFlow_1c5s46o">
+        <di:waypoint xsi:type="dc:Point" x="1961" y="-109" />
+        <di:waypoint xsi:type="dc:Point" x="318" y="-109" />
+        <di:waypoint xsi:type="dc:Point" x="318" y="77" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2044" y="-222" width="69" height="24" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_1b3hgo5_di" bpmnElement="SequenceFlow_1b3hgo5">
-        <di:waypoint xsi:type="dc:Point" x="2011" y="-149" />
-        <di:waypoint xsi:type="dc:Point" x="2011" y="-192" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="2026" y="-176.5" width="0" height="12" />
+          <dc:Bounds x="1139.5" y="-130" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

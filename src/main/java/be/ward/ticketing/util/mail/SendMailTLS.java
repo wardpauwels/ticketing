@@ -1,7 +1,6 @@
 package be.ward.ticketing.util.mail;
 
 import be.ward.ticketing.exception.MailException;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -9,13 +8,15 @@ import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
 public class SendMailTLS {
-    @Value("${sendmail.mail.username}")
-    private static String username;
 
-    @Value("${sendmail.mail.password}")
-    private static String password;
+    private String username = "camundamailtest@gmail.com";
 
-    public static void sendMail(String to, String subject, String mailText) {
+    private String password = "camundamail";
+
+    public SendMailTLS() {
+    }
+
+    public void sendMail(String to, String subject, String mailText) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");

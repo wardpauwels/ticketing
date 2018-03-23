@@ -1,8 +1,8 @@
 package be.ward.ticketing.amqp.receivers;
 
 import be.ward.ticketing.conf.SpringBeansConfiguration;
+import be.ward.ticketing.util.ticket.Constants;
 import be.ward.ticketing.util.ticket.Messages;
-import be.ward.ticketing.util.ticket.Variables;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
@@ -34,9 +34,8 @@ public class ProblemNotSolvedReceiver {
         processEngine
                 .getRuntimeService()
                 .createMessageCorrelation(Messages.MSG_PROBLEM_NOT_SOLVED)
-                .setVariable(Variables.VAR_COMMENT, comment)
+                .setVariable(Constants.VAR_COMMENT, comment)
                 .processInstanceBusinessKey(String.valueOf(ticketId))
                 .correlateWithResult();
     }
-
 }

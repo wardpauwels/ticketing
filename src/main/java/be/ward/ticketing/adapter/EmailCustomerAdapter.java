@@ -3,8 +3,7 @@ package be.ward.ticketing.adapter;
 import be.ward.ticketing.entities.ticketing.Ticket;
 import be.ward.ticketing.service.TicketingService;
 import be.ward.ticketing.util.mail.SendMailTLS;
-import be.ward.ticketing.util.ticket.TicketStatus;
-import be.ward.ticketing.util.ticket.Variables;
+import be.ward.ticketing.util.ticket.Constants;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +28,15 @@ public class EmailCustomerAdapter implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution delegateExecution) {
-        Ticket ticket = ticketingService.findTicket((Long) delegateExecution.getVariable(Variables.VAR_TICKET_ID));
+        Long ticketId = (Long) delegateExecution.getVariable(Constants.VAR_TICKET_ID);
+        Ticket ticket = ticketingService.findTicket(ticketId);
 
         //TODO: Get mail address from the user
-        SendMailTLS.sendMail(
+        SendMailTLS sendMailTLS = new SendMailTLS();
+        sendMailTLS.sendMail(
                 mailTo,
                 mailSubject,
                 "Your ticket has been answered.\n Your question was: \n" + ticket.getDescription()
         );
-
-        delegateExecution.setVariable(Variables.VAR_STATUS, TicketStatus.mailSent);
     }
 }

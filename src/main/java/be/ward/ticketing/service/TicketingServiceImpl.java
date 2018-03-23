@@ -6,6 +6,7 @@ import be.ward.ticketing.data.user.UserDao;
 import be.ward.ticketing.entities.ticketing.*;
 import be.ward.ticketing.entities.user.Role;
 import be.ward.ticketing.entities.user.User;
+import be.ward.ticketing.util.ticket.AssociationTypes;
 import be.ward.ticketing.util.ticket.TicketStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,8 @@ import java.util.Date;
 @Service
 public class TicketingServiceImpl implements TicketingService {
 
+    @Autowired
+    private AssociationDao associationDao;
     @Autowired
     private DomainDao domainDao;
     @Autowired
@@ -34,6 +37,56 @@ public class TicketingServiceImpl implements TicketingService {
     private TopicDao topicDao;
     @Autowired
     private UserDao userDao;
+
+    // ASSOCIATION
+    @Override
+    public Association createAssociation(String associationType, Ticket ticket) {
+        Association association = new Association(associationType, ticket);
+        return associationDao.save(association);
+    }
+
+    @Override
+    public Association linkNewAssociationToAssociation(Association newAssociation, Association oldAssociation) {
+        Association association = findAssociationById(oldAssociation.getId());
+        association.setAssociation(newAssociation);
+        return associationDao.save(association);
+    }
+
+    @Override
+    public Association getTopAssociationFromTicket(Ticket ticket) {
+        Association association = findAssociationByTicket(ticket);
+        Association aboveAssociation = findAssociationByAssociation(association);
+        while (aboveAssociation != null) {
+            association = aboveAssociation;
+            aboveAssociation = findAssociationByAssociation(association);
+            if (aboveAssociation == null) return association;
+        }
+        return association;
+    }
+
+    @Override
+    public Association getLastAssociationFromTicket(Ticket ticket) {
+        Association association = findAssociationByTicket(ticket);
+        while (association.getAssociation() != null) {
+            association = association.getAssociation();
+        }
+        return association;
+    }
+
+    @Override
+    public Association findAssociationById(Long associationId) {
+        return associationDao.findOne(associationId);
+    }
+
+    @Override
+    public Association findAssociationByTicket(Ticket ticket) {
+        return associationDao.findByTicket(ticket);
+    }
+
+    @Override
+    public Association findAssociationByAssociation(Association association) {
+        return associationDao.findByAssociation(association);
+    }
 
     // TICKETS
     @Override
@@ -93,11 +146,17 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     @Override
-    public Ticket answerOnTicketWithId(Long ticketId, String answer) {
+    public Ticket answerOnTicketWithId(Long ticketId, String user, String answer) {
         Ticket ticket = findTicket(ticketId);
-        ticket.setStatus(TicketStatus.ticketAnswered);
-        ticket.setTopicText(answer);
-        return ticketDao.save(ticket);
+        setTicketStatus(ticket.getId(), TicketStatus.ticketAnswered);
+        Association association = getLastAssociationFromTicket(ticket);
+
+        Ticket answerTicket = createTicket(user, answer);
+        Association answerAssociation = createAssociation(AssociationTypes.answer, answerTicket);
+
+        linkNewAssociationToAssociation(answerAssociation, association);
+
+        return ticketDao.save(answerTicket);
     }
 
     @Override
@@ -106,8 +165,6 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     //DOMAIN
-
-
     @Override
     public Iterable<Domain> findAllDomains() {
         return domainDao.findAll();
@@ -118,8 +175,8 @@ public class TicketingServiceImpl implements TicketingService {
         return domainDao.findOne(id);
     }
 
-    //PRIORITY
 
+    //PRIORITY
     @Override
     public Iterable<Priority> findAllPriorities() {
         return priorityDao.findAll();
@@ -135,15 +192,15 @@ public class TicketingServiceImpl implements TicketingService {
         return priorityDao.findByNameEquals(name);
     }
 
-    // ROLE
 
+    // ROLE
     @Override
     public Iterable<Role> findAllRoles() {
         return roleDao.findAll();
     }
 
-    //SOURCE
 
+    //SOURCE
     @Override
     public Iterable<Source> findAllSources() {
         return sourceDao.findAll();
@@ -155,7 +212,6 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     //TICKET TYPE
-
     @Override
     public Iterable<TicketType> findAllTicketTypes() {
         return ticketTypeDao.findAll();
@@ -166,8 +222,8 @@ public class TicketingServiceImpl implements TicketingService {
         return ticketTypeDao.findOne(id);
     }
 
-    //TOPIC
 
+    //TOPIC
     @Override
     public Iterable<Topic> findAllTopics() {
         return topicDao.findAll();
@@ -178,8 +234,8 @@ public class TicketingServiceImpl implements TicketingService {
         return topicDao.findOne(id);
     }
 
-    // USER
 
+    // USER
     @Override
     public User createUser(String username, String password) {
         User user = new User(username, encoder.encode(password));
