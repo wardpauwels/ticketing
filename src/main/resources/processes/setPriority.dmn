@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" id="definitions_047owv5" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="setPriority" name="Priority">
+    <extensionElements>
+      <biodi:bounds x="200" y="200" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input id="input1" label="Topic" camunda:inputVariable="topic_id">
+        <inputExpression id="inputExpression1" typeRef="string">
+          <text>topic_id</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0ydhpti" label="Domain" camunda:inputVariable="domain_id">
+        <inputExpression id="LiteralExpression_1qt2u52" typeRef="string">
+          <text>domain_id</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1ktmc5n" label="Creator" camunda:inputVariable="creator">
+        <inputExpression id="LiteralExpression_1mnuolh" typeRef="string">
+          <text>creator</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0bup731" label="Created At" camunda:inputVariable="created_at">
+        <inputExpression id="LiteralExpression_1cph2j8" typeRef="date">
+          <text>created_at</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Priority" name="priority" typeRef="string" />
+      <rule id="row-297399253-7">
+        <description></description>
+        <inputEntry id="UnaryTests_1xaz42x">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1u1ag1i">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1pbvohr">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_15e14na">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1cch31y">
+          <text><![CDATA["Urgent"]]></text>
+        </outputEntry>
+      </rule>
+      <rule id="row-297399253-2">
+        <description></description>
+        <inputEntry id="UnaryTests_05di13f">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_03opkqf">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1h5gsvn">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1512j3d">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0s7v1jr">
+          <text><![CDATA["High"]]></text>
+        </outputEntry>
+      </rule>
+      <rule id="row-297399253-3">
+        <description></description>
+        <inputEntry id="UnaryTests_0v7afas">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1s5syqc">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ku0nx3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_02v2uds">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1yn9edh">
+          <text><![CDATA["Medium"]]></text>
+        </outputEntry>
+      </rule>
+      <rule id="row-297399253-4">
+        <inputEntry id="UnaryTests_1e5lqq0">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0f9ucf6">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0szzrwc">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ugd0jq">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_11hn1fi">
+          <text><![CDATA["Low"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

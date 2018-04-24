@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions_0yrf3vv" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="assignGroup" name="Assign Group">
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input id="input1" label="Topic" camunda:inputVariable="topic_id">
+        <inputExpression id="inputExpression1" typeRef="string">
+          <text>topic_id</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1cgc4wz" label="Domain" camunda:inputVariable="domain_id">
+        <inputExpression id="LiteralExpression_0a2ks2l" typeRef="string">
+          <text>domain_id</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Assigned Group" name="assigned_group" typeRef="string" />
+      <rule id="row-595974569-1">
+        <inputEntry id="UnaryTests_1ancgxr">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1kd1l32">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_12dydn5">
+          <text><![CDATA["administrator"]]></text>
+        </outputEntry>
+      </rule>
+      <rule id="row-714219222-1">
+        <inputEntry id="UnaryTests_1gtme0o">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_16dzffy">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_06ecxcg">
+          <text><![CDATA["moderator"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

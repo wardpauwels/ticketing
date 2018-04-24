@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions_18ye2bt" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="assignUser" name="Assign User">
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input id="input1" label="Topic" camunda:inputVariable="topic_id">
+        <inputExpression id="inputExpression1" typeRef="string">
+          <text>topic_id</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0dj5ohn" label="Domain" camunda:inputVariable="domain_id">
+        <inputExpression id="LiteralExpression_118lbjb" typeRef="string">
+          <text>domain_id</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0pv8que" label="Assigned Group" camunda:inputVariable="assigned_group">
+        <inputExpression id="LiteralExpression_1krumf7" typeRef="string">
+          <text>assigned_group</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_0wbg9ce">
+          <text><![CDATA["administrator","moderator"]]></text>
+        </inputValues>
+      </input>
+      <output id="output1" label="Assigned User" name="assigned_user" typeRef="string" />
+      <rule id="row-297399253-6">
+        <inputEntry id="UnaryTests_0kft61f">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1p0ax3s">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ril6x5">
+          <text><![CDATA["administrator"]]></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1i7py50">
+          <text><![CDATA["ward"]]></text>
+        </outputEntry>
+      </rule>
+      <rule id="row-595974569-2">
+        <inputEntry id="UnaryTests_1ncl1x1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1xog32c">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1tew092">
+          <text><![CDATA["moderator"]]></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_05r64s4">
+          <text><![CDATA["demo"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
